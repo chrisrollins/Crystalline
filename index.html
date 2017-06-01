@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test</title>
+	<script type="text/javascript" src="crystalline.js"></script>
+	<script type="text/javascript">
+
+	(function()
+	{
+		const testEl = document.createElement("div");
+		testEl.innerText = "hi";
+		testEl.style["font-weight"] = "bold";
+		testEl.style["background-color"] = "#000";
+		testEl.style["color"] = "#fff";
+		
+		Crystalline.init("testArray", []);
+		Crystalline.init("userInput", "");
+		Crystalline.set("2DArr", [[testEl, "b", "c"], ["q", "w", "e"], ["z", "x", "c"]]);
+
+		Crystalline.bind("#testContent", "userInput");
+		Crystalline.bind("#testInput").out("userInput");
+		Crystalline.bind("#arrayHolder", "testArray");
+		Crystalline.bind("#TwoDArrTest", "2DArr");
+
+		Crystalline.eventListener("#addToArrayBtn", "onmouseup", function(e)
+		{
+			const inputData = document.querySelector("#testInput").value;
+			Crystalline.testArray.push(inputData);
+		});
+
+		Crystalline.eventListener("#clearArrayBtn", "onmouseup", function(e)
+		{
+			Crystalline.set("testArray", []);
+		});
+
+	})();
+
+	</script>
+	<style type="text/css">
+		* {
+			padding: 0px;
+			margin: 0px;
+		}
+		table {
+			border: solid 1px #000;
+		}
+		td {
+			width: 20px;
+			border: solid 1px #000;
+		}
+		#wrapper, #wrapper div {
+			margin: 3%;
+		}
+	</style>
+</head>
+<body>
+
+<div id="wrapper">
+	<div>
+		<ul id="arrayHolder">
+		</ul>
+	</div>
+
+	<div>
+		<table id="TwoDArrTest">
+		</table>
+	</div>
+	<div>
+		<p id="testContent"></p>
+	
+		<label for="testInput">Enter something:</label>
+	
+		<input type="text" id="testInput">
+	
+		<button id="addToArrayBtn">Add!</button>
+
+		<button id="clearArrayBtn">Clear!</button>
+	
+		<a href="test.html">test</a>
+	</div>
+</div>
+
+</body>
+</html>

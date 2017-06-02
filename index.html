@@ -7,11 +7,16 @@
 
 	(function()
 	{
-		const testEl = document.createElement("div");
-		testEl.innerText = "hi";
-		testEl.style["font-weight"] = "bold";
-		testEl.style["background-color"] = "#000";
-		testEl.style["color"] = "#fff";
+		const testProps = {
+			innerText: "hi",
+			style: {
+				"font-weight": "bold",
+				"background-color": "#000",
+				"color": "#fff"
+			}
+		};
+		
+		const testEl = Crystalline.createElement("div", testProps);
 		
 		Crystalline.init("testArray", []);
 		Crystalline.init("userInput", "");
@@ -25,7 +30,7 @@
 		Crystalline.eventListener("#addToArrayBtn", "onmouseup", function(e)
 		{
 			const inputData = document.querySelector("#testInput").value;
-			Crystalline.testArray.push(inputData);
+			Crystalline.data.testArray.push(inputData);
 		});
 
 		Crystalline.eventListener("#clearArrayBtn", "onmouseup", function(e)

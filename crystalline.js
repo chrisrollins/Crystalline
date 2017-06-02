@@ -5,9 +5,12 @@ const Crystalline = (function()
 	const keysInitialized = {};
 	let CrElementCount = 0;
 	let windowLoaded = false;
-	const API = {};
+	const API = {
+		data:{}
+	};
 
-	return (function(){
+	return (function()
+	{
 		//SETUP
 		const dataStorage = function()
 		{
@@ -112,7 +115,7 @@ const Crystalline = (function()
 
 		//INTERNAL FUNCTIONS
 
-		function generateElement(elementType)
+		function generateElement(elementType) //FOR INTERNAL USE ONLY
 		{
 			const el = document.createElement(elementType);
 			el.CrID = CrElementCount++;
@@ -332,6 +335,41 @@ const Crystalline = (function()
 
 		//API FUNCTIONS
 
+		function API_createElement(tagName, properties)
+		{
+			if(typeof tagName !== "string")
+			{
+				console.error(`${frameworkName}: Type error. Invalid input for tagName. Must be a string.`);
+				console.trace();
+				return undefined;
+			}
+			if(typeof properties !== "object")
+			{
+				console.error(`${frameworkName}: Type error. Invalid input for properties. Must be an object.`);
+				console.trace();
+				return undefined;
+			}
+			const el = document.createElement(tagName);
+			for(const key in properties)
+			{
+				if(typeof properties[key] === "string")
+				{
+					el[key] = properties[key];
+				}
+				else if(typeof properties[key] === "object")
+				{
+					for(const inner in properties[key])
+					{
+						if(typeof properties[key][inner] === "string")
+						{
+							el[key][inner] = properties[key][inner];
+						}
+					}
+				}
+			}
+			return el;
+		}
+
 		function API_template(dataKey, HTMLStringOrElement)
 		{
 			let str;
@@ -365,9 +403,17 @@ const Crystalline = (function()
 		{
 			if(!keysInitialized[name])
 			{
-				keysInitialized[name]= true;
 				API_set(name, value);
-				Object.defineProperty(API, name,
+			}
+		}
+
+		function API_set(name, value)
+		{
+			dataStorage.set(name, value);
+			if(!keysInitialized[name])
+			{
+				keysInitialized[name]= true;
+				Object.defineProperty(API.data, name,
 				{
 					set: function(value)
 					{
@@ -379,11 +425,6 @@ const Crystalline = (function()
 					}
 				});
 			}
-		}
-
-		function API_set(name, value)
-		{
-			dataStorage.set(name, value);
 			refreshName(name);
 		}
 
@@ -396,7 +437,6 @@ const Crystalline = (function()
 		{
 			const DOMelement = elementOrSelector;
 			let DOMElementDirectRef = DOMelement;
-			//if(typeof DOMelement === "string")
 			if(!isHTMLElement(DOMelement))
 			{
 				delayUntilWindowLoad(function()
@@ -451,13 +491,14 @@ const Crystalline = (function()
 			}
 		}
 
-		return Object.assign(API, {
+		return Object.freeze(Object.assign(API, {
 			init: API_init,
 			set: API_set,
 			get: API_get,
 			bind: API_bind,
-			eventListener: API_eventListener
-		});
+			eventListener: API_eventListener,
+			createElement: API_createElement
+		}));
 	
 	})();
 })();

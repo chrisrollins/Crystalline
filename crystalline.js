@@ -281,7 +281,7 @@ const Crystalline = (function()
 								for(const colName of colNameArr)
 								{
 									const td = generateElement("td");
-									if(arr[colName])
+									if(arr[colName] !== "" && arr[colName] !== undefined)
 									{
 										updateDispatch(td, arr[colName]);
 										atLeastOneColumn = true;

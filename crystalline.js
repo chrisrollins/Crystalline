@@ -57,6 +57,16 @@ const Crystalline = (function()
 			});
 		}();
 
+		const warning = function(msg)
+		{
+			console.warn(`${libName}: ${msg}`);
+		};
+
+		const error = function(msg)
+		{
+			console.error(`${libName}: ${msg}`);
+		};
+
 		for(const name in dataStorage.all)
 		{
 			if(!keysInitialized[name])
@@ -76,11 +86,11 @@ const Crystalline = (function()
 					if(typeof window[event] === "function")
 					{
 						funcs.push(window[event]);
-						console.warn(`${libName}: There was already a function in window.${event}. It has been included in the ${libName} event dispatcher's function list. It will still be called when window.${event} triggers.`);
+						warning(`There was already a function in window.${event}. It has been included in the ${libName} event dispatcher's function list. It will still be called when window.${event} triggers.`);
 					}
 					else
 					{
-						console.warn(`${libName}: There was an event conflict with window.${event}. There was a non-function value in the event. It has been overwritten by the ${libName} event dispatcher.`);
+						warning(`There was an event conflict with window.${event}. There was a non-function value in the event. It has been overwritten by the ${libName} event dispatcher.`);
 					}
 				}
 
@@ -165,7 +175,7 @@ const Crystalline = (function()
 			{
 				if(data === undefined || data === null)
 				{
-					console.warn(`${libName}: The data bound to <${element.nodeName.toLowerCase()}> tag with id '${element.id}' is undefined.`);
+					warning(`The data bound to <${element.nodeName.toLowerCase()}> tag with id '${element.id}' is undefined.`);
 					return;
 				}
 				else if(isHTMLElement(data))
@@ -302,11 +312,11 @@ const Crystalline = (function()
 							}
 							else if(arr === null)
 							{
-								console.warn(`${libName}: Found null while building table from array [ ${data} ] at index ${i}.`);
+								warning(`Found null while building table from array [ ${data} ] at index ${i}.`);
 							}
 							else
 							{
-								console.warn(`${libName}: Found undefined while building table from array [ ${data} ] at index ${i}. This can be caused by forgetting a comma between an object and an array.`);
+								warning(`Found undefined while building table from array [ ${data} ] at index ${i}. This can be caused by forgetting a comma between an object and an array.`);
 							}
 							if(attachRow)
 							{
@@ -393,14 +403,14 @@ const Crystalline = (function()
 		{
 			if(typeof tagName !== "string")
 			{
-				console.error(`${libName}: Type error. Invalid input for tagName. Must be a string.`);
-				console.trace();
+				error(`Type error. Invalid input for tagName. Must be a string.`);
+				
 				return undefined;
 			}
 			if(typeof properties !== "object")
 			{
-				console.error(`${libName}: Type error. Invalid input for properties. Must be an object.`);
-				console.trace();
+				error(`Type error. Invalid input for properties. Must be an object.`);
+				
 				return undefined;
 			}
 			const el = document.createElement(tagName);
@@ -437,7 +447,7 @@ const Crystalline = (function()
 			}
 			else
 			{
-				console.warn(`${libName}: Invalid template argument passed for the data key '${dataKey}'. It should be a string or html element.`);
+				warning(`Invalid template argument passed for the data key '${dataKey}'. It should be a string or html element.`);
 			}
 		}
 
@@ -536,7 +546,7 @@ const Crystalline = (function()
 							}
 							else
 							{
-								console.warn(`${libName}: out binding is not available for ${DOMelement} because it doesn't take user input.`);
+								warning(`out binding is not available for ${DOMelement} because it doesn't take user input.`);
 							}
 						});
 						return API_bind;

@@ -1,6 +1,6 @@
 const Crystalline = (function()
 {
-	const frameworkName = "Crystalline";
+	const libName = "Crystalline";
 	const nameBindings = {};
 	const keysInitialized = {};
 	let CrElementCount = 0;
@@ -8,6 +8,11 @@ const Crystalline = (function()
 	const API = {
 		data:{}
 	};
+
+	//TODO
+	//How to handle objects
+	//An object should make a table with keys as the column names and values as the cell values
+	//An array of objects should therefore collect all keys and then fill in the cells with each object's value
 
 	return (function()
 	{
@@ -70,11 +75,11 @@ const Crystalline = (function()
 					if(typeof window[event] === "function")
 					{
 						funcs.push(window[event]);
-						console.warn(`${frameworkName}: There was already a function in window.${event}. It has been included in the ${frameworkName} event dispatcher's function list. It will still be called when window.${event} triggers.`);
+						console.warn(`${libName}: There was already a function in window.${event}. It has been included in the ${libName} event dispatcher's function list. It will still be called when window.${event} triggers.`);
 					}
 					else
 					{
-						console.warn(`${frameworkName}: There was an event conflict with window.${event}. There was a non-function value in the event. It has been overwritten by the ${frameworkName} event dispatcher.`);
+						console.warn(`${libName}: There was an event conflict with window.${event}. There was a non-function value in the event. It has been overwritten by the ${libName} event dispatcher.`);
 					}
 				}
 
@@ -115,7 +120,7 @@ const Crystalline = (function()
 
 		//INTERNAL FUNCTIONS
 
-		function generateElement(elementType) //FOR INTERNAL USE ONLY
+		function generateElement(elementType)
 		{
 			const el = document.createElement(elementType);
 			el.CrID = CrElementCount++;
@@ -159,7 +164,7 @@ const Crystalline = (function()
 			{
 				if(data === undefined || data === null)
 				{
-					console.warn(`${frameworkName}: The data bound to <${element.nodeName.toLowerCase()}> tag with id '${element.id}' is undefined.`);
+					console.warn(`${libName}: The data bound to <${element.nodeName.toLowerCase()}> tag with id '${element.id}' is undefined.`);
 					return;
 				}
 				else if(isHTMLElement(data))
@@ -217,66 +222,97 @@ const Crystalline = (function()
 			{
 				if(typeof data === "object")
 				{
-					const fragment = document.createDocumentFragment();
+					let thead;
+					let tbody;
+					const theadFrag = document.createDocumentFragment();
+					const tbodyFrag = document.createDocumentFragment();
 					if(element.nodeName === "TABLE")
 					{
 						for(const child of element.childNodes)
 						{
-							if(child.nodeName === "TBODY")
+							if(child.nodeName === "THEAD")
 							{
-								element = child;
-								break;
+								thead = child;
+							}
+							else if(child.nodeName === "TBODY")
+							{
+								tbody = child;
 							}
 						}
 					}
+
 					if(Array.isArray(data))
 					{
-						let atLeastTwoDimensions = true;
-						for(let i = 0; i < data.length; i++)
+						const colNames = new Set();
+						for(const item of data)
 						{
-							if(!Array.isArray(data[i]))
+							if(typeof item === "object" && !Array.isArray(item))
 							{
-								atLeastTwoDimensions = false;
-								break;
+								for(const key in item)
+								{
+									colNames.add(key);
+								}
 							}
 						}
-						const outer = (atLeastTwoDimensions)?data:[data];
+						
+						const colNameArr = Array.from(colNames.values());
+
+						if(colNames.size > 0)
+						{
+							const tr = generateElement("tr");
+							for(const colName of colNameArr)
+							{
+								const th = generateElement("th");
+								updateDispatch(th, colName);
+								tr.appendChild(th);
+							}
+							theadFrag.appendChild(tr);
+						}
+
+						const outer = data;
 						for(const arr of outer)
 						{
 							const tr = generateElement("tr");
-							const inner = (Array.isArray(arr))?arr:[arr];
-							for(const item of inner)
+							if(typeof arr === "object" && !Array.isArray(arr))
 							{
-								const td = generateElement("td")
-								updateDispatch(td, item);
-								tr.appendChild(td);
+								for(const colName of colNameArr)
+								{
+									const td = generateElement("td")
+									updateDispatch(td, arr[colName]);
+									tr.appendChild(td);
+								}
 							}
-							fragment.appendChild(tr);
+							else
+							{
+								const inner = (Array.isArray(arr))?arr:[arr];
+								for(const item of inner)
+								{
+									const td = generateElement("td")
+									updateDispatch(td, item);
+									tr.appendChild(td);
+								}
+							}
+							tbodyFrag.appendChild(tr);
 						}
 					}
 					else
 					{
-						for(let i = 2; i > 0; i--)
-						{
-							const tr = generateElement("tr");
-							for(const key in data)
-							{
-
-								const td = generateElement("td");
-								if(i === 2)
-								{
-									td.innerText = key;
-								}
-								else
-								{
-									updateDispatch(td, data[key]);
-								}
-								tr.appendChild(td);
-							}
-							fragment.appendChild(tr);
-						}
+						updateDispatch(element, [data]);
 					}
-					element.appendChild(fragment);
+					
+					console.log(thead);
+					if(!thead)
+					{
+						const fragment = document.createDocumentFragment();
+						fragment.appendChild(theadFrag);
+						fragment.appendChild(tbodyFrag);
+						(tbody || element).appendChild(fragment);
+					}
+					else
+					{
+						thead.appendChild(theadFrag);
+						(tbody || element).appendChild(tbodyFrag);
+					}
 				}
 				else
 				{
@@ -339,13 +375,13 @@ const Crystalline = (function()
 		{
 			if(typeof tagName !== "string")
 			{
-				console.error(`${frameworkName}: Type error. Invalid input for tagName. Must be a string.`);
+				console.error(`${libName}: Type error. Invalid input for tagName. Must be a string.`);
 				console.trace();
 				return undefined;
 			}
 			if(typeof properties !== "object")
 			{
-				console.error(`${frameworkName}: Type error. Invalid input for properties. Must be an object.`);
+				console.error(`${libName}: Type error. Invalid input for properties. Must be an object.`);
 				console.trace();
 				return undefined;
 			}
@@ -383,7 +419,7 @@ const Crystalline = (function()
 			}
 			else
 			{
-				console.warn(`${frameworkName}: Invalid template argument passed for the data key '${dataKey}'. It should be a string or html element.`);
+				console.warn(`${libName}: Invalid template argument passed for the data key '${dataKey}'. It should be a string or html element.`);
 			}
 		}
 
@@ -482,7 +518,7 @@ const Crystalline = (function()
 							}
 							else
 							{
-								console.warn(`${frameworkName}: out binding is not available for ${DOMelement} because it doesn't take user input.`);
+								console.warn(`${libName}: out binding is not available for ${DOMelement} because it doesn't take user input.`);
 							}
 						});
 						return API_bind;

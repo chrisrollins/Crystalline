@@ -20,7 +20,7 @@
 		
 		Crystalline.init("testArray", []);
 		Crystalline.init("userInput", "");
-		Crystalline.set("2DArr", [[testEl, "b", "c"], ["q", "w", "e"], ["z", "x", "c"]]);
+		Crystalline.set("2DArr", [{x: 1, y: 2, z: 3}, {x: 4, z: 2, y: 5}, [testEl, "b", "c"], ["q", "w", "e"], ["z", "x", "c"]]);
 
 		Crystalline.bind("#testContent", "userInput");
 		Crystalline.bind("#testInput").out("userInput");

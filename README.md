@@ -25,7 +25,7 @@ name: The name of the key.
 __Crystalline.bind__(_string_|_HTMLElement_ __elementOrSelector__, _string_ __name__)  
 Binds an element on the DOM to a key in the Crystalline data store. This will display the value of the key in the element whenever the value in the data store changes. Either an element reference or a selector string can be passed as the first argument. A selector string is prefered because this function will automatically wait for the element to be loaded into the DOM in that case.  
 If the element takes user input, it is both in and out bound, meaning that changes to the value of the input element will change the data, and changes to the data will change the input element's value.  
-There is a lot of automatic behavior tied to this function. __TODO: Detail automatic behavior.__
+There is a lot of automatic behavior tied to this function. __TODO: Detail automatic behavior.__  
 __Parameters__  
 elementOrSelector: Either a direct reference to an element, or the selector string for an element (eg. "#myDivID")  
 name: the data key to bind the element to.  

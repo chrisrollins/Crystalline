@@ -20,12 +20,23 @@
 		
 		Crystalline.init("testArray", []);
 		Crystalline.init("userInput", "");
-		Crystalline.set("2DArr", [{x: 1, y: 2, z: 3}, {x: 4, z: 2, y: 5}, [testEl, "b", "c"], ["q", "w", "e"], ["z", "x", "c"]]);
+		Crystalline.set("2DArr", [["3", "2", "1"],[testEl, "b", "c"], ["q", "w", "e"], ["z", "x", "c"]]);
+		Crystalline.set("objectArr",
+			[
+				{"name": "", "favorite food": "", "hobby": "", "age": "", "location": ""},
+				{"name": "Phil", "age": "22", "favorite food": "pizza"},
+				{"name": "Bob", "age": "21", "hobby": "snowboarding"},
+				{"name": "Jane", "age": "31", "hobby": "skydiving"},
+				{"name": "Jim", "age": "24", "hobby": "cooking"},
+				{"name": "Sarah", "age": "25", "hobby": "gaming"}
+			]
+		);
 
 		Crystalline.bind("#testContent", "userInput");
 		Crystalline.bind("#testInput").out("userInput");
 		Crystalline.bind("#arrayHolder", "testArray");
 		Crystalline.bind("#TwoDArrTest", "2DArr");
+		Crystalline.bind("#objTest", "objectArr");
 
 		Crystalline.eventListener("#addToArrayBtn", "onmouseup", function(e)
 		{
@@ -52,6 +63,8 @@
 		td {
 			width: 20px;
 			border: solid 1px #000;
+			padding-right: 5px;
+			padding-left: 5px;
 		}
 		#wrapper, #wrapper div {
 			margin: 3%;
@@ -70,6 +83,14 @@
 		<table id="TwoDArrTest">
 		</table>
 	</div>
+
+	<div>
+		<table id="objTest">
+		<thead></thead>
+		<tbody></tbody>
+		</table>
+	</div>
+	
 	<div>
 		<p id="testContent"></p>
 	

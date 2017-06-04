@@ -1,6 +1,7 @@
 const Crystalline = (function()
 {
-	const libName = "Crystalline";
+	"use strict";
+	const libName = "Crystalline"
 	const nameBindings = {};
 	const keysInitialized = {};
 	let CrElementCount = 0;
@@ -269,30 +270,48 @@ const Crystalline = (function()
 							theadFrag.appendChild(tr);
 						}
 
-						const outer = data;
-						for(const arr of outer)
+						for(let i = 0; i < data.length; i++)
 						{
+							const arr = data[i];
 							const tr = generateElement("tr");
-							if(typeof arr === "object" && !Array.isArray(arr))
+							let attachRow = true;
+							if(typeof arr === "object" && !Array.isArray(arr) && arr !== null)
 							{
+								let atLeastOneColumn = false;
 								for(const colName of colNameArr)
 								{
-									const td = generateElement("td")
-									updateDispatch(td, arr[colName]);
+									const td = generateElement("td");
+									if(arr[colName])
+									{
+										updateDispatch(td, arr[colName]);
+										atLeastOneColumn = true;
+									}
 									tr.appendChild(td);
 								}
+								attachRow = atLeastOneColumn;
 							}
-							else
+							else if(arr !== undefined && arr !== null)
 							{
 								const inner = (Array.isArray(arr))?arr:[arr];
 								for(const item of inner)
 								{
-									const td = generateElement("td")
+									const td = generateElement("td");
 									updateDispatch(td, item);
 									tr.appendChild(td);
 								}
 							}
-							tbodyFrag.appendChild(tr);
+							else if(arr === null)
+							{
+								console.warn(`${libName}: Found null while building table from array [ ${data} ] at index ${i}.`);
+							}
+							else
+							{
+								console.warn(`${libName}: Found undefined while building table from array [ ${data} ] at index ${i}. This can be caused by forgetting a comma between an object and an array.`);
+							}
+							if(attachRow)
+							{
+								tbodyFrag.appendChild(tr);
+							}
 						}
 					}
 					else
@@ -300,7 +319,6 @@ const Crystalline = (function()
 						updateDispatch(element, [data]);
 					}
 					
-					console.log(thead);
 					if(!thead)
 					{
 						const fragment = document.createDocumentFragment();

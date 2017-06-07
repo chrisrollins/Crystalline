@@ -10,11 +10,6 @@ const Crystalline = (function()
 		data:{}
 	};
 
-	//TODO
-	//How to handle objects
-	//An object should make a table with keys as the column names and values as the cell values
-	//An array of objects should therefore collect all keys and then fill in the cells with each object's value
-
 	return (function()
 	{
 		//SETUP

@@ -70,58 +70,65 @@ const Crystalline = (function()
 			}
 		}
 		
-		(function()
+		for(const event of ["onabort", "onafterprint", "onanimationcancel", "onanimationend", "onanimationiteration", "onappinstalled", "onauxclick", "onbeforeinstallprompt", "onbeforeprint", "onbeforeunload", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "ondevicelight", "ondevicemotion", "ondeviceorientation", "ondeviceorientationabsolute", "ondeviceproximity", "ondragdrop", "onerror", "onfocus", "ongotpointercapture", "onhashchange", "oninput", "onkeydown", "onkeypress", "onkeyup", "onlanguagechange", "onload", "onloadend", "onloadstart", "onlostpointercapture", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onmozbeforepaint", "onpaint", "onpointercancel", "onpointerdown", "onpointerenter", "onpointerleave", "onpointermove", "onpointerout", "onpointerover", "onpointerup", "onpopstate", "onrejectionhandled", "onreset", "onresize", "onscroll", "onselect", "onselectionchange", "onselectstart", "onstorage", "onsubmit", "ontouchcancel", "ontouchmove", "ontouchstart", "ontransitioncancel", "ontransitionend", "onunhandledrejection", "onunload", "onuserproximity", "onvrdisplayconnected", "onvrdisplaydisconnected", "onvrdisplaypresentchange"])
 		{
-			for(const event of ["onabort", "onafterprint", "onanimationcancel", "onanimationend", "onanimationiteration", "onappinstalled", "onauxclick", "onbeforeinstallprompt", "onbeforeprint", "onbeforeunload", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "ondevicelight", "ondevicemotion", "ondeviceorientation", "ondeviceorientationabsolute", "ondeviceproximity", "ondragdrop", "onerror", "onfocus", "ongotpointercapture", "onhashchange", "oninput", "onkeydown", "onkeypress", "onkeyup", "onlanguagechange", "onload", "onloadend", "onloadstart", "onlostpointercapture", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onmozbeforepaint", "onpaint", "onpointercancel", "onpointerdown", "onpointerenter", "onpointerleave", "onpointermove", "onpointerout", "onpointerover", "onpointerup", "onpopstate", "onrejectionhandled", "onreset", "onresize", "onscroll", "onselect", "onselectionchange", "onselectstart", "onstorage", "onsubmit", "ontouchcancel", "ontouchmove", "ontouchstart", "ontransitioncancel", "ontransitionend", "onunhandledrejection", "onunload", "onuserproximity", "onvrdisplayconnected", "onvrdisplaydisconnected", "onvrdisplaypresentchange"])
-			{
-				const funcs = [];
+			const funcs = [];
 
-				if(window[event] !== undefined && window[event] !== null)
+			if(window[event] !== undefined && window[event] !== null)
+			{
+				if(typeof window[event] === "function")
 				{
-					if(typeof window[event] === "function")
+					funcs.push(window[event]);
+					warning(`There was already a function in window.${event}. It has been included in the ${libName} event dispatcher's function list. It will still be called when window.${event} triggers.`);
+				}
+				else
+				{
+					warning(`There was an event conflict with window.${event}. There was a non-function value in the event. It has been overwritten by the ${libName} event dispatcher.`);
+				}
+			}
+
+			window[event] = function(e)
+			{
+				let result;
+				for(const f of funcs)
+				{
+					const fres = f(e);
+					if(fres !== undefined)
 					{
-						funcs.push(window[event]);
-						warning(`There was already a function in window.${event}. It has been included in the ${libName} event dispatcher's function list. It will still be called when window.${event} triggers.`);
-					}
-					else
-					{
-						warning(`There was an event conflict with window.${event}. There was a non-function value in the event. It has been overwritten by the ${libName} event dispatcher.`);
+						result = fres;
 					}
 				}
 
-				window[event] = function(e)
+				if(result !== undefined)
 				{
-					let result;
-					funcs.forEach(function(f)
+					return result;
+				}
+			};
+
+			Object.defineProperty(window, event,
+			{
+				set: function(...f)
+				{
+					for(const func of f)
 					{
-						const fres = f(e);
-						if(fres !== undefined)
+						if(typeof func === "function")
 						{
-							result = fres;
+							funcs.push(func);
 						}
-					});
-
-					if(result !== undefined)
-					{
-						return result;
+						else
+						{
+							error(`Type error: window.${event} cannot be assigned to non-function value.`);
+						}
 					}
-				};
-
-				Object.defineProperty(window, event,
-				{
-					set: function(f)
-					{
-						funcs.push(f);
-					}
-				});
-			}
-
-		})();
+				}
+			});
+		}
 
 		window.onload = function()
 		{
 			windowLoaded = true;
-		}
+		};
+
 		//END SETUP
 
 		//INTERNAL FUNCTIONS
@@ -165,6 +172,11 @@ const Crystalline = (function()
 
 		function updateDispatch(element, data)
 		{
+			if(!element || !isHTMLElement(element))
+			{
+				error("Element is undefined.");
+				return;
+			}
 			clearElement(element);
 			const defaultFunc = function()
 			{
@@ -394,19 +406,28 @@ const Crystalline = (function()
 
 		//API FUNCTIONS
 
+		function API_createElementFromData(tagName, data, properties)
+		{
+			let el = API_createElement(tagName, properties);
+			if(data)
+			{
+				updateDispatch(el, data);
+			}
+			return el;
+		}
+
 		function API_createElement(tagName, properties)
 		{
 			if(typeof tagName !== "string")
 			{
-				error(`Type error. Invalid input for tagName. Must be a string.`);
+				error(`Type error. Invalid argument for tagName. Must be a string.`);
 				
 				return undefined;
 			}
-			if(typeof properties !== "object")
+			if(properties && typeof properties !== "object")
 			{
-				error(`Type error. Invalid input for properties. Must be an object.`);
-				
-				return undefined;
+				error(`Type error. Invalid argument for properties. Must be an object.`);
+				properties = {};
 			}
 			const el = document.createElement(tagName);
 			for(const key in properties)
@@ -556,7 +577,8 @@ const Crystalline = (function()
 			get: API_get,
 			bind: API_bind,
 			eventListener: API_eventListener,
-			createElement: API_createElement
+			createElement: API_createElement,
+			createElementFromData: API_createElementFromData
 		}));
 	
 	})();

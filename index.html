@@ -17,6 +17,7 @@
 		};
 
 		const testEl = Crystalline.createElement("div", testProps);
+		const elFromData = Crystalline.createElementFromData("div", ["test1", "test2"]);
 		
 		Crystalline.init("testArray", []);
 		Crystalline.init("userInput", "");
@@ -48,6 +49,11 @@
 		{
 			Crystalline.set("testArray", []);
 		});
+
+		window.onload = function()
+		{
+			document.querySelector("#wrapper").appendChild(elFromData);
+		}
 
 	})();
 

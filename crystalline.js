@@ -54,12 +54,28 @@ const Crystalline = (function()
 
 		const warning = function(msg)
 		{
-			console.warn(`${libName}: ${msg}`);
+			if(!Array.isArray(msg))
+			{
+				msg = [msg];
+			}
+
+			for(const m of msg)
+			{
+				console.warn(`${libName}: ${m}`);
+			}
 		};
 
 		const error = function(msg)
 		{
-			console.error(`${libName}: ${msg}`);
+			if(!Array.isArray(msg))
+			{
+				msg = [msg];
+			}
+
+			for(const m of msg)
+			{
+				console.error(`${libName}: ${m}`);
+			}
 		};
 
 		for(const name in dataStorage.all)
@@ -130,6 +146,62 @@ const Crystalline = (function()
 		};
 
 		//END SETUP
+
+		//UTILITY
+
+		const DefineAllowedValues = function(obj, config, silent = true)
+		{
+			const errs = [];
+			if(typeof obj !== "object" && typeof obj !== "function")
+			{
+				errs.push("obj is not valid type.")
+			}
+			for(const key in config)
+			{
+				if(!Array.isArray(config[key]))
+				{
+					errs.push("Improper config format for defining object allowed values.");
+				}
+			}
+			if(errs.length > 0)
+			{
+				if(!silent)
+				{
+					error(errs);
+				}
+				return;
+			}
+
+			for(const key in config)
+			{
+				let storedVal;
+				Object.defineProperty(obj, key,
+				{
+					get: function()
+					{
+						return storedVal;
+					},
+  					set: function(newVal)
+  					{
+  						for(const allowed of config[key])
+  						{
+  							if(newVal === allowed)
+  							{
+  								storedVal = newVal;
+  								break;
+  							}
+  						}
+  						if(!silent && storedVal !== newVal)
+  						{
+  							error(`Could not set property '${key}' of ${obj} to value ${newVal}. Allowed values: ${config[key]}`);
+  						}
+  					}
+				});
+			}
+		}
+
+
+		//END UTILITY
 
 		//INTERNAL FUNCTIONS
 
@@ -404,6 +476,123 @@ const Crystalline = (function()
 
 		//END INTERNAL FUNCTIONS
 
+
+		//HTTP
+
+		const API_http = (function()
+		{
+			const httpSend = Object.freeze(function(method, path)
+			{
+				const thisRef = this;
+				const fetchOptions = {};
+				for(const key of ["mode", "headers", "credentials", "cache", "redirect", "referrer", "integrity"])
+				{
+					fetchOptions[key] = thisRef.options[key];
+				}
+				
+				fetchOptions.body = (method !== "GET" && method !== "HEAD")?thisRef.options.JSONbody:undefined;
+				fetchOptions.method = (method || thisRef.options.method);
+
+				return new Promise(function(resolve, reject)
+				{
+					fetch(thisRef.options.baseURL + path, fetchOptions).then(function(res)
+					{
+						console.log(res);
+						res.text().then(function(data)
+						{ 
+							console.log(data);
+							resolve({status: res.status, headers: res.headers, statusText: res.statusText, url: res.url, body: data});
+						})
+						.catch(function(err)
+						{
+							reject(err);
+						});
+					})
+					.catch(function(err){
+						reject(err);
+					});
+
+				});
+			});
+			const generateOptions = function()
+			{
+				let JSONbody = "{}";
+				options = {
+					//additional options
+					baseURL: "",
+					//fetch API options
+					method: "GET", //GET, POST, PUT, PATCH, DELETE, etc...
+					headers: {},
+					mode: "cors", //cors, no-cors, same-origin, navigate
+					credentials: "omit", //omit, same-origin, include
+					cache: "default", //default, no-store, reload, force-cache, only-if-cache
+					redirect: "follow", //follow, error, manual
+					referrer: "about:client", //about:client, no-referrer, <URL>
+					integrity: "",
+					get JSONbody()
+					{
+						return JSONbody;
+					},
+					get body()
+					{
+						return JSON.parse(JSONbody);
+					},
+					set body(v)
+					{
+						if(typeof v === "object")
+						{
+							JSONbody = JSON.stringify(v);
+						}
+						else
+						{
+							error("body must be an object or array.");
+						}
+					}
+				};
+				DefineAllowedValues(options, {
+					mode: ["cors", "no-cors", "same-origin", "navigate"],
+					credentials: ["omit", "same-origin", "include"],
+					cache: ["default", "no-store", "reload", "force-cache", "only-if-cache"],
+					redirect: ["follow", "error", "manual"]
+				});
+				Object.seal(options);
+
+				return options;
+			};
+
+			const applyMethods = function(obj)
+			{
+				for(const method of ["GET", "POST", "PUT", "PATCH", "DELETE"])
+				{
+					obj[method.toLowerCase()] = httpSend.bind(obj, method);
+				}
+				obj.request = httpSend.bind(obj);
+			}
+
+			const http = function(options)
+			{
+				if(this === window)
+				{
+					error("Constructor must be called with the 'new' keyword.");
+				}
+				else
+				{ 
+					this.options = generateOptions();
+					for(let key in this.options)
+					{
+						this.options[key] = (options[key] || this.options[key]);
+					}
+					applyMethods(this);
+				}
+			}
+			http.options = generateOptions();
+			applyMethods(http);
+
+			return http;
+		})();
+
+		////////////
+
 		//API FUNCTIONS
 
 		function API_createElementFromData(tagName, data, properties)
@@ -572,13 +761,14 @@ const Crystalline = (function()
 		}
 
 		return Object.freeze(Object.assign(API, {
-			init: API_init,
-			set: API_set,
-			get: API_get,
-			bind: API_bind,
-			eventListener: API_eventListener,
-			createElement: API_createElement,
-			createElementFromData: API_createElementFromData
+			init: Object.freeze(API_init),
+			set: Object.freeze(API_set),
+			get: Object.freeze(API_get),
+			bind: Object.freeze(API_bind),
+			eventListener: Object.freeze(API_eventListener),
+			createElement: Object.freeze(API_createElement),
+			createElementFromData: Object.freeze(API_createElementFromData),
+			http: Object.freeze(API_http)
 		}));
 	
 	})();

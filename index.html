@@ -18,7 +18,18 @@
 
 		const testEl = Crystalline.createElement("div", testProps);
 		const elFromData = Crystalline.createElementFromData("div", ["test1", "test2"]);
-		
+
+		Crystalline.http.options.mode = "no-cors";
+		Crystalline.http.get("/test").then(function(res)
+		{
+			console.log(res);
+			console.log(res.body);
+		})
+		.catch(function(err)
+		{
+			console.log(err);
+		});
+
 		Crystalline.init("testArray", []);
 		Crystalline.init("userInput", "");
 		Crystalline.set("2DArr", [["3", "2", "1"],[testEl, "b", "c"], ["q", "w", "e"], ["z", "x", "c"]]);

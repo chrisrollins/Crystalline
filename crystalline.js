@@ -490,7 +490,7 @@ const Crystalline = (function()
 					fetchOptions[key] = thisRef.options[key];
 				}
 				
-				fetchOptions.body = (method !== "GET" && method !== "HEAD")?thisRef.options.JSONbody:undefined;
+				fetchOptions.body = (method.toUpperCase() !== "GET" && method.toUpperCase() !== "HEAD")?thisRef.options.body:undefined;
 				fetchOptions.method = (method || thisRef.options.method);
 
 				return new Promise(function(resolve, reject)
@@ -516,8 +516,7 @@ const Crystalline = (function()
 			});
 			const generateOptions = function()
 			{
-				let JSONbody = "{}";
-				options = {
+				const options = {
 					//additional options
 					baseURL: "",
 					//fetch API options
@@ -529,25 +528,7 @@ const Crystalline = (function()
 					redirect: "follow", //follow, error, manual
 					referrer: "about:client", //about:client, no-referrer, <URL>
 					integrity: "",
-					get JSONbody()
-					{
-						return JSONbody;
-					},
-					get body()
-					{
-						return JSON.parse(JSONbody);
-					},
-					set body(v)
-					{
-						if(typeof v === "object")
-						{
-							JSONbody = JSON.stringify(v);
-						}
-						else
-						{
-							error("body must be an object or array.");
-						}
-					}
+					body: undefined,
 				};
 				DefineAllowedValues(options, {
 					mode: ["cors", "no-cors", "same-origin", "navigate"],

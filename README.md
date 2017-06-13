@@ -14,7 +14,7 @@ value: the data for this key.
   
   
 __Crystalline.set__(_string_ __name__, _string|number|object|array|HTMLElement_ __value__)  
-Sets the value of a key in the Crystalline data store. This works the same way as init, except that it will always set the value. Therefore, it is not prefered for creating new keys, as it will overwrite them if they already existed before page navigation. The primary purpose of this function is to change the value of an existing key.
+Sets the value of a key in the Crystalline data store. This works the same way as init, except that it will always set the value. Therefore, it is not prefered for creating new keys, as it will overwrite them if they already existed before page navigation. The primary purpose of this function is to change the value of an existing key.  
 __Parameters__  
 name: The name of the key.  
 value: the data for this key.  
@@ -49,7 +49,7 @@ Crystalline.bind("#myEl").in("myData").out("myData) or Crystalline.bind("#myEl")
   
 __Crystalline.eventListener__(_string_|_HTMLElement_ __elementOrSelector__, _string_ __event__, _function_ __callback__)  
 Creates an event listener on the target element which uses the provided callback. This function will automatically wait for the element to be loaded to the DOM if elementOrSelector is a selector string. This convenience is the main purpose of this function.  
-__Parameters__
+__Parameters__  
 elementOrSelector: Either a direct reference to an element, or the selector string for an element (eg. "#myDivID")
 event: the name of the event (eg. "onmouseup")
 callback: the function that will be called when the event triggers  
@@ -60,6 +60,14 @@ __Crystalline.createElement__(_string_ __tagName__, _object_ __properties__)
 Returns a new HTMLElement with the specified tag and applies properties from the provided object. The properties object maps directly to the structure of an HTMLElement, so use a format like this:  
 { "innerText": "anything you want", style: { "background-color": "#000", "width": "100px", "height": "100px"}  
 This is slightly more convenient than using document.createElement and then setting each property. That's all this does.  
-__Parameters__
-tagName: the tag for the new element. (eg. "div")
+__Parameters__  
+tagName: the tag for the new element. (eg. "div")  
+properties: the properties for the new element.  
+  
+  
+__Crystalline.createElementFromData__(_string_ __tagName__, _string|number|object|array|HTMLElement_ data, _object_ __properties__)  
+Returns a new HTMLElement with the specified tag, applies the provided properties, and applies the given data value to the element using the same rendering rules as data binding. The difference is that the element is static after being created.  
+__Parameters__  
+tagName: the tag for the new element. (eg. "div")  
+data: a value to render in the element  
 properties: the properties for the new element.  

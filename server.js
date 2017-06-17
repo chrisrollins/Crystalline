@@ -1,7 +1,9 @@
 const port = 5000;
 const http = require("http");
 const fs = require("fs");
+const backEnd = require("./backend.js");
 
+//SERVER UTILITY
 const detectFileExt = function(filename)
 {
 	let ext;
@@ -16,6 +18,20 @@ const detectFileExt = function(filename)
 	return ext;
 }
 
+const mimeTypes = {
+	"html": "text/html",
+	"htm" : "text/html",
+	"mp3": "audio/mpeg",
+	"mp4": "video/mp4",
+	"jpeg": "image/jpeg",
+	"jpg": "image/jpeg",
+	"png": "image/png",
+	"js": "text/javascript",
+	"css": "text/css"
+};
+
+
+//FUNCTIONS
 const respond = function(response, status, contents, ...headers)
 {
 	for(const header of headers)
@@ -28,7 +44,25 @@ const respond = function(response, status, contents, ...headers)
 	response.writeHead(status);
 	if(contents)
 	{
-		response.write(contents);
+		try{
+			if(typeof contents !== "string")
+			{
+				if(typeof contents === "object")
+				{
+					contents = JSON.stringify(contents);
+				}
+				else
+				{
+					contents = contents.toString();
+				}
+			}
+			response.write(contents);
+		}
+		catch(e)
+		{
+			console.log("Exception while trying to write response.");
+			console.log(e);
+		}
 	}
 	response.end();
 }
@@ -49,60 +83,69 @@ const sendFile = function(response, filename)
 	});
 }
 
-const testController = function(request, response)
+
+//MAIN CONTROLLER
+const mainController = function(request, response)
 {
-	respond(response, 200, `{"test": 1}`);
+	console.log("Requested URL:", request.url);
+	return true;
 }
 
+
+//CONTROLLERS
+const topicListController = function(request, response)
+{
+	respond(response, 200, backEnd.getTopicList());
+}
+
+
+//ROUTES
 const routes = {
 	"/" : "index.html",
-	"/test" : testController
+	"/forum" : "./forum/index.html",
+	"/topic_list" : topicListController
 }
-
-const mimeTypes = {
-	"html": "text/html",
-	"htm" : "text/html",
-	"mp3": "audio/mpeg",
-	"mp4": "video/mp4",
-	"jpeg": "image/jpeg",
-	"jpg": "image/jpeg",
-	"png": "image/png",
-	"js": "text/javascript",
-	"css": "text/css"
-};
 
 try
 {
 	const server = http.createServer(function (request, response)
 	{
-		console.log("client request URL: ", request.url);
-		const ext = detectFileExt(request.url);
-		if(ext)
+		if(mainController(request, response) === true)
 		{
-			done = 0;
-			if(request.url[0] === "/")
+			const ext = detectFileExt(request.url);
+			if(ext)
 			{
-				request.url = request.url.slice(1);
-			}
-			sendFile(response, request.url);
-		}
-		else
-		{
-			const routeResult = routes[request.url];
-			if(typeof routeResult === "function")
-			{
-				routeResult(request, response);
-			}
-			else if(typeof routeResult === "string")
-			{
-				sendFile(response, routeResult);
+				done = 0;
+				if(request.url[0] === "/")
+				{
+					request.url = request.url.slice(1);
+				}
+				sendFile(response, request.url);
 			}
 			else
 			{
-				respond(response, 500, "Internal server error.");
+				const routeResult = routes[request.url];
+				if(routeResult !== undefined)
+				{
+					if(typeof routeResult === "function")
+					{
+						routeResult(request, response);
+					}
+					else if(typeof routeResult === "string")
+					{
+						sendFile(response, routeResult);
+					}
+					else
+					{
+						respond(response, 500, "Internal server error.");
+					}
+				}
+				else
+				{
+					respond(response, 400, "Bad request.");
+				}
 			}
 		}
-		
 	});
 	server.listen(port);
 	console.log(`Listening on port ${port}`);

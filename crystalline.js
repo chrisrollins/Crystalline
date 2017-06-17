@@ -5,7 +5,7 @@ const Crystalline = (function()
 	const nameBindings = {};
 	const keysInitialized = {};
 	let CrElementCount = 0;
-	let windowLoaded = false;
+	let loaded = false;
 	const API = {
 		data:{}
 	};
@@ -142,7 +142,7 @@ const Crystalline = (function()
 
 		window.onload = function()
 		{
-			windowLoaded = true;
+			loaded = true;
 		};
 
 		//END SETUP
@@ -448,15 +448,18 @@ const Crystalline = (function()
 			return elements[elementTag.toLowerCase()];
 		}
 
-		function delayUntilWindowLoad(callback)
+		function delayUntilLoad(callback)
 		{
-			if(!windowLoaded)
+			if(!loaded)
 			{
-				window.onload = callback;
+				window.onload = function(e)
+				{
+					callback({delayed: true, event: e});
+				};
 			}
 			else
 			{
-				callback();
+				callback({delayed: false, event: undefined});
 			}
 		}
 
@@ -497,10 +500,8 @@ const Crystalline = (function()
 				{
 					fetch(thisRef.options.baseURL + path, fetchOptions).then(function(res)
 					{
-						console.log(res);
 						res.text().then(function(data)
 						{ 
-							console.log(data);
 							resolve({status: res.status, headers: res.headers, statusText: res.statusText, url: res.url, body: data});
 						})
 						.catch(function(err)
@@ -552,6 +553,7 @@ const Crystalline = (function()
 
 			const http = function(options)
 			{
+				options = (options || {});
 				if(this === window)
 				{
 					error("Constructor must be called with the 'new' keyword.");
@@ -645,7 +647,7 @@ const Crystalline = (function()
 			}
 			else
 			{
-				delayUntilWindowLoad(function(){ document.querySelector(elementOrSelector)[event] = callback; });
+				delayUntilLoad(function(arg){ document.querySelector(elementOrSelector)[event] = callback; });
 			}
 		}
 
@@ -689,14 +691,14 @@ const Crystalline = (function()
 			let DOMElementDirectRef = DOMelement;
 			if(!isHTMLElement(DOMelement))
 			{
-				delayUntilWindowLoad(function()
+				delayUntilLoad(function(arg)
 				{
 					DOMElementDirectRef = document.querySelector(DOMelement);
 				});
 			}
 			if(name !== undefined)
 			{
-				delayUntilWindowLoad(function()
+				delayUntilLoad(function(arg)
 				{
 					if(isTagOutBindable(DOMElementDirectRef.nodeName))
 					{
@@ -711,7 +713,7 @@ const Crystalline = (function()
 				return{
 					in: function(name)
 					{
-						delayUntilWindowLoad(function()
+						delayUntilLoad(function(arg)
 						{
 							( nameBindings[name] || (nameBindings[name] = []) ).push(DOMElementDirectRef);
 							DOMElementDirectRef.CrNameBind = name;
@@ -720,7 +722,7 @@ const Crystalline = (function()
 					},
 					out: function(name)
 					{
-						delayUntilWindowLoad(function()
+						delayUntilLoad(function(arg)
 						{
 							if(isTagOutBindable(DOMElementDirectRef.nodeName))
 							{

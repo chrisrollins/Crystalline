@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="crystalline.js"></script>
+	<script type="text/javascript">
+		Crystalline.init("userName", "Guest");
+		Crystalline.init("topicList", {});
+		Crystalline.bind("#topic_list", "topicList");
+		const httpClient = new Crystalline.http();
+
+		httpClient.get("topic_list").then(function(data)
+		{
+			console.log(data.body);
+			Crystalline.set("topicList", JSON.parse(data.body));
+		})
+		.catch(function(err)
+		{
+			console.log(err);
+		});
+
+	</script>
+	<title>Forum</title>
+</head>
+<body>
+<h2>Topics</h2>
+<div id="topic_list"></div>
+</body>
+</html>

@@ -46,7 +46,7 @@ const Crystalline = (function()
 				},
 				getFormat: function(name)
 				{
-					return _data[name].formatRules;
+					return (_data[name] || {formatRules:undefined}).formatRules;
 				},
 				get all()
 				{
@@ -485,16 +485,6 @@ const Crystalline = (function()
 		function isHTMLElement(element)
 		{
 			return element instanceof HTMLElement;
-			// let current = Object.getPrototypeOf(element);
-			// while(current !== null)
-			// {
-			// 	if(current === HTMLElement.prototype)
-			// 	{
-			// 		return true;
-			// 	}
-			// 	current = Object.getPrototypeOf(current);
-			// }
-			// return false;
 		}
 
 		//END INTERNAL FUNCTIONS

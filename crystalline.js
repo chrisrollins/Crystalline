@@ -25,8 +25,7 @@ const Crystalline = (function()
 			{
 				set: function(name, value)
 				{
-					_data[name] = { value: value };
-					_data[name].template = "";
+					_data[name] = Object.assign(_data[name] || {}, { value: value });
 					sessionStorage._CrSession = JSON.stringify(_data);
 					if(Array.isArray(value))
 					{
@@ -41,9 +40,13 @@ const Crystalline = (function()
 				{
 					return _data[name].value;
 				},
-				setTemplate: function(name, str)
+				setFormat: function(name, rules)
 				{
-					_data[name].template = str;
+					_data[name].formatRules = rules;
+				},
+				getFormat: function(name)
+				{
+					return _data[name].formatRules;
 				},
 				get all()
 				{
@@ -231,18 +234,18 @@ const Crystalline = (function()
 
 		function refreshElement(element)
 		{
-			updateDispatch(element, dataStorage.get(element.CrNameBind));
+			updateDispatch(element, dataStorage.get(element.CrNameBind), element.CrNameBind);
 		}
 
 		function refreshName(name)
 		{
 			for(const element of (nameBindings[name] || []))
 			{
-				updateDispatch(element, dataStorage.get(name));
+				updateDispatch(element, dataStorage.get(name), element.CrNameBind);
 			}
 		}
 
-		function updateDispatch(element, data)
+		function updateDispatch(element, data, name)
 		{
 			if(!element || !isHTMLElement(element))
 			{
@@ -264,7 +267,7 @@ const Crystalline = (function()
 				else if(typeof data === "object")
 				{
 					const table = generateElement("table");
-					updateDispatch(table, data);
+					updateDispatch(table, data, name);
 					element.appendChild(table);
 				}
 				else
@@ -291,7 +294,7 @@ const Crystalline = (function()
 						const li = generateElement("li");
 						if(typeof item === "object")
 						{
-							updateDispatch(li, item);
+							updateDispatch(li, item, name);
 						}
 						else
 						{
@@ -312,6 +315,8 @@ const Crystalline = (function()
 			{
 				if(typeof data === "object")
 				{
+					const format = dataStorage.getFormat(name) || Object.create(null);
+					//{key: { name: string, template: {tag: string, class: string, href: string} } }
 					let thead;
 					let tbody;
 					const theadFrag = document.createDocumentFragment();
@@ -353,7 +358,7 @@ const Crystalline = (function()
 							for(const colName of colNameArr)
 							{
 								const th = generateElement("th");
-								updateDispatch(th, colName);
+								updateDispatch(th, (format[colName]) ? (format[colName].name || colName) : colName, name);
 								tr.appendChild(th);
 							}
 							theadFrag.appendChild(tr);
@@ -372,7 +377,21 @@ const Crystalline = (function()
 									const td = generateElement("td");
 									if(arr[colName] !== "" && arr[colName] !== undefined)
 									{
-										updateDispatch(td, arr[colName]);
+										let toRender = arr[colName];
+										if(format[colName] && format[colName]["template"])
+										{
+											toRender = generateElement((format[colName]["template"]["tag"] || "span"));
+
+											for(const key in format[colName]["template"])
+											{
+												if(toRender[key] !== undefined && typeof toRender[key] !== "function")
+												{
+													toRender[key] = format[colName]["template"][key];
+												}
+											}
+											updateDispatch(toRender, arr[colName]);
+										}
+										updateDispatch(td, toRender, name);
 										atLeastOneColumn = true;
 									}
 									tr.appendChild(td);
@@ -385,7 +404,7 @@ const Crystalline = (function()
 								for(const item of inner)
 								{
 									const td = generateElement("td");
-									updateDispatch(td, item);
+									updateDispatch(td, item, name);
 									tr.appendChild(td);
 								}
 							}
@@ -405,7 +424,7 @@ const Crystalline = (function()
 					}
 					else
 					{
-						updateDispatch(element, [data]);
+						updateDispatch(element, [data], name);
 					}
 					
 					if(!thead)
@@ -465,16 +484,17 @@ const Crystalline = (function()
 
 		function isHTMLElement(element)
 		{
-			let current = element.__proto__;
-			while(current !== null)
-			{
-				if(current.toString() === "[object HTMLElement]")
-				{
-					return true;
-				}
-				current = current.__proto__;
-			}
-			return false;
+			return element instanceof HTMLElement;
+			// let current = Object.getPrototypeOf(element);
+			// while(current !== null)
+			// {
+			// 	if(current === HTMLElement.prototype)
+			// 	{
+			// 		return true;
+			// 	}
+			// 	current = Object.getPrototypeOf(current);
+			// }
+			// return false;
 		}
 
 		//END INTERNAL FUNCTIONS
@@ -661,6 +681,18 @@ const Crystalline = (function()
 			}
 		}
 
+		function API_format(name, rules)
+		{
+			if(typeof name === "string" && (Object.getPrototypeOf(rules) + "") === "[object Object]")
+			{
+				dataStorage.setFormat(name, rules);
+			}
+			else
+			{
+				error("Incorrect input for the format method. Requires a string for the data key and an object for the rules.");
+			}	
+		}
+
 		function API_init(name, value)
 		{
 			if(!keysInitialized[name])
@@ -758,6 +790,7 @@ const Crystalline = (function()
 			set: Object.freeze(API_set),
 			get: Object.freeze(API_get),
 			bind: Object.freeze(API_bind),
+			format: Object.freeze(API_format),
 			eventListener: Object.freeze(API_eventListener),
 			createElement: Object.freeze(API_createElement),
 			createElementFromData: Object.freeze(API_createElementFromData),

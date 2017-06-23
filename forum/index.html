@@ -6,6 +6,12 @@
 		Crystalline.init("userName", "Guest");
 		Crystalline.init("topicList", {});
 		Crystalline.bind("#topic_list", "topicList");
+		Crystalline.format("topicList", {
+			title: {name: "Title", template: {tag: "a", class: "topicLink", href: "static_post_url_sadface"}},
+			poster: {name: "Poster", template: {tag: "a", class: "posterLink", href: "static_poster_url_sadface"}},
+			replies: {name: "Replies"},
+			postDate: {name: "Posted"}
+		});
 		const httpClient = new Crystalline.http();
 
 		httpClient.get("topic_list").then(function(data)

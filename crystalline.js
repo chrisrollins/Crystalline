@@ -493,7 +493,17 @@ const Crystalline = (function()
 					fetchOptions[key] = thisRef.options[key];
 				}
 				
-				fetchOptions.body = (method.toUpperCase() !== "GET" && method.toUpperCase() !== "HEAD")?thisRef.options.body:undefined;
+				if(thisRef.options.body)
+				{
+					if(method.toUpperCase() !== "GET" && method.toUpperCase() !== "HEAD")
+					{
+						fetchOptions.body = thisRef.options.body;
+					}
+					else
+					{
+						warning(`Crystalline.http is implemented with the fetch API which does not allow GET or HEAD requests to have a body so the body for this request was discarded.`);
+					}
+				}
 				fetchOptions.method = (method || thisRef.options.method);
 
 				return new Promise(function(resolve, reject)

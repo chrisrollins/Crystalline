@@ -203,7 +203,6 @@ const Crystalline = (function()
 			}
 		}
 
-
 		//END UTILITY
 
 		//INTERNAL FUNCTIONS
@@ -243,6 +242,22 @@ const Crystalline = (function()
 			{
 				updateDispatch(element, dataStorage.get(name), element.CrNameBind);
 			}
+		}
+
+		function parseFormatTemplateProp(template, columnData)
+		{
+			const sections = template.split("{{");
+
+			for(let i = 0; i < sections.length; i++)
+			{
+				const temp = sections[i].split("}}");
+				if(temp.length === 2)
+				{
+					sections[i] = columnData[temp[0]];
+				}
+			}
+
+			return sections.join("");
 		}
 
 		function updateDispatch(element, data, name)
@@ -345,7 +360,10 @@ const Crystalline = (function()
 							{
 								for(const key in item)
 								{
-									colNames.add(key);
+									if((format[key] || Object.create(null)).display !== "")
+									{
+										colNames.add(key);
+									}
 								}
 							}
 						}
@@ -358,7 +376,7 @@ const Crystalline = (function()
 							for(const colName of colNameArr)
 							{
 								const th = generateElement("th");
-								updateDispatch(th, (format[colName]) ? (format[colName].name || colName) : colName, name);
+								updateDispatch(th, (format[colName]) ? (format[colName].display || colName) : colName, name);
 								tr.appendChild(th);
 							}
 							theadFrag.appendChild(tr);
@@ -386,7 +404,7 @@ const Crystalline = (function()
 											{
 												if(toRender[key] !== undefined && typeof toRender[key] !== "function")
 												{
-													toRender[key] = format[colName]["template"][key];
+													toRender[key] = parseFormatTemplateProp(format[colName]["template"][key], arr);
 												}
 											}
 											updateDispatch(toRender, arr[colName]);

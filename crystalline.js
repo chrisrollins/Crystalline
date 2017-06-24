@@ -25,13 +25,19 @@ const Crystalline = (function()
 			{
 				set: function(name, value)
 				{
-					_data[name] = Object.assign(_data[name] || {}, { value: value });
+					_data[name] = (_data[name] || {});
+					_data[name].value = value;
 					sessionStorage._CrSession = JSON.stringify(_data);
 					if(Array.isArray(value))
 					{
 						value.push = function(pushedVal)
 						{
 							Array.prototype.push.call(value, pushedVal);
+							API_set(name, value);
+						},
+						value.unshift = function(prependedValue)
+						{
+							Array.prototype.unshift.call(value, prependedValue);
 							API_set(name, value);
 						}
 					}
@@ -331,7 +337,6 @@ const Crystalline = (function()
 				if(typeof data === "object")
 				{
 					const format = dataStorage.getFormat(name) || Object.create(null);
-					//{key: { name: string, template: {tag: string, class: string, href: string} } }
 					let thead;
 					let tbody;
 					const theadFrag = document.createDocumentFragment();

@@ -213,9 +213,9 @@ const Crystalline = (function()
 
 		//INTERNAL FUNCTIONS
 
-		function generateElement(elementType)
+		function generateElement(elementType, properties)
 		{
-			const el = document.createElement(elementType);
+			const el = Object.assign(document.createElement(elementType), properties);
 			el.CrID = CrElementCount++;
 			el.CrCleared = true;
 			return el;
@@ -285,6 +285,21 @@ const Crystalline = (function()
 				{
 					element.appendChild(data);
 				}
+				else if(isPromise(data))
+				{
+					const promiseDestination = generateElement("div", {innerText: "Loading...", style: {display: "inline-block"}});
+					updateDispatch(element, promiseDestination);
+					data.then(function(result)
+					{
+						promiseDestination.innerText = "";
+						updateDispatch(promiseDestination, result, name);
+					})
+					.catch(function(err)
+					{
+						promiseDestination.innerText = "";
+						updateDispatch(promiseDestination, generateElement("span", {innerText: "Error loading data."}));
+					});
+				}
 				else if(typeof data === "object")
 				{
 					const table = generateElement("table");
@@ -299,7 +314,7 @@ const Crystalline = (function()
 					}
 					else
 					{
-						element.innerText = data;
+						updateDispatch(element, generateElement("span", {innerText: data}));
 					}
 				}
 
@@ -505,9 +520,14 @@ const Crystalline = (function()
 			}
 		}
 
-		function isHTMLElement(element)
+		function isHTMLElement(obj)
 		{
-			return element instanceof HTMLElement;
+			return obj instanceof HTMLElement;
+		}
+
+		function isPromise(obj)
+		{
+			return obj instanceof Promise;
 		}
 
 		//END INTERNAL FUNCTIONS
@@ -544,7 +564,7 @@ const Crystalline = (function()
 					fetch(thisRef.options.baseURL + path, fetchOptions).then(function(res)
 					{
 						res.text().then(function(data)
-						{ 
+						{
 							resolve({status: res.status, headers: res.headers, statusText: res.statusText, url: res.url, body: data});
 						})
 						.catch(function(err)
@@ -785,7 +805,6 @@ const Crystalline = (function()
 								{
 									API_set(name, DOMElementDirectRef.value);
 								}
-								API_set(name, DOMElementDirectRef.value);
 							}
 							else
 							{

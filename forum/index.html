@@ -18,7 +18,6 @@
 
 		httpClient.get("topic_list").then(function(data)
 		{
-			console.log(data.body);
 			Crystalline.set("topicList", JSON.parse(data.body));
 			Crystalline.data.topicList.unshift({title: "", replies: "", poster: "", postDate: ""});
 		})

@@ -98,12 +98,19 @@ const topicListController = function(request, response)
 	respond(response, 200, backEnd.getTopicList());
 }
 
+const docContentController = function(request, response)
+{
+	respond(response, 200, backEnd.getDocContent());
+}
+
 
 //ROUTES
 const routes = {
 	"/" : "index.html",
 	"/forum" : "./forum/index.html",
-	"/topic_list" : topicListController
+	"/doc_app" : "./docApp/index.html",
+	"/topic_list" : topicListController,
+	"/doc_app_content" : docContentController
 }
 
 try

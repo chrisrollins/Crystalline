@@ -7,12 +7,12 @@
 		Crystalline.init("topicList", []);
 		Crystalline.bind("#topic_list", "topicList");
 		Crystalline.format("topicList", {
-			title: {display: "Title", template: {tag: "a", class: "topicLink", href: "post_{{postID}}"}},
-			poster: {display: "Poster", template: {tag: "a", class: "posterLink", href: "poster_{{posterID}}"}},
-			replies: {display: "Replies"},
-			postDate: {display: "Posted"},
-			postID: {display: ""},
-			posterID: {display: ""}
+			title: {title: "Title", template: {tag: "a", class: "topicLink", href: "post_{{postID}}"}},
+			poster: {title: "Poster", template: {tag: "a", class: "posterLink", href: "poster_{{posterID}}"}},
+			replies: {title: "Replies"},
+			postDate: {title: "Posted"},
+			postID: {showTitle: false, showValue: false},
+			posterID: {showTitle: false, showValue: false}
 		});
 		const httpClient = new Crystalline.http();
 

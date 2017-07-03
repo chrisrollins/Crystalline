@@ -10,5 +10,14 @@ module.exports = {
 			{ poster: "Chris", title: "Test4", replies: 0, postDate: "6/15/2017", postID: 4, posterID: 1 },
 		];
 		return data;
+	},
+	getDocContent: function(){
+		const data = [
+			{message: "this is a test message"},
+			{message: "this is a red test message", color: "#ff0000"},
+			{message: "this is a green test message", color: "#00ff00"},
+			{message: "this is a blue test message", color: "#0000ff"}
+		];
+		return data;
 	}
 }

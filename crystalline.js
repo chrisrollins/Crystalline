@@ -380,7 +380,7 @@ const Crystalline = (function()
 							{
 								for(const key in item)
 								{
-									if((format[key] || Object.create(null)).display !== "")
+									if((format[key] || Object.create(null)).showValue !== false)
 									{
 										colNames.add(key);
 									}
@@ -395,9 +395,11 @@ const Crystalline = (function()
 							const tr = generateElement("tr");
 							for(const colName of colNameArr)
 							{
-								const th = generateElement("th");
-								updateDispatch(th, (format[colName]) ? (format[colName].display || colName) : colName, name);
-								tr.appendChild(th);
+								if((format[colName] || Object.create(null)).showTitle !== false){
+									const th = generateElement("th");
+									updateDispatch(th, (format[colName]) ? (format[colName].title || colName) : colName, name);
+									tr.appendChild(th);
+								}
 							}
 							theadFrag.appendChild(tr);
 						}
@@ -422,9 +424,16 @@ const Crystalline = (function()
 
 											for(const key in format[colName]["template"])
 											{
-												if(toRender[key] !== undefined && typeof toRender[key] !== "function")
+												if(toRender[key] !== undefined && typeof format[colName]["template"][key] === "string")
 												{
 													toRender[key] = parseFormatTemplateProp(format[colName]["template"][key], arr);
+												}
+												else if(key === "style" && Object.getPrototypeOf(format[colName]["template"]["style"]) === Object.prototype)
+												{
+													for(let rule in format[colName]["template"]["style"])
+													{
+														toRender["style"][rule] = parseFormatTemplateProp(format[colName]["template"]["style"][rule], arr);
+													}
 												}
 											}
 											updateDispatch(toRender, arr[colName]);

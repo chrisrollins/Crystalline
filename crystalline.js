@@ -158,7 +158,7 @@ const Crystalline = (function()
 
 		//UTILITY
 
-		const DefineAllowedValues = function(obj, config, silent = true)
+		const defineAllowedValues = function(obj, config, silent = true)
 		{
 			const errs = [];
 			if(typeof obj !== "object" && typeof obj !== "function")
@@ -594,7 +594,7 @@ const Crystalline = (function()
 					integrity: "",
 					body: undefined,
 				};
-				DefineAllowedValues(options, {
+				defineAllowedValues(options, {
 					mode: ["cors", "no-cors", "same-origin", "navigate"],
 					credentials: ["omit", "same-origin", "include"],
 					cache: ["default", "no-store", "reload", "force-cache", "only-if-cache"],

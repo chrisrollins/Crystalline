@@ -4,28 +4,37 @@
 	<title>Forum</title>
 	<script type="text/javascript" src="crystalline.js"></script>
 	<script type="text/javascript">
-		Crystalline.init("topicList", []);
-		Crystalline.bind("#topic_list", "topicList");
-		Crystalline.format("topicList", {
-			title: {display: "Title", template: {tag: "a", class: "topicLink", href: "post_{{postID}}"}},
-			poster: {display: "Poster", template: {tag: "a", class: "posterLink", href: "poster_{{posterID}}"}},
-			replies: {display: "Replies"},
-			postDate: {display: "Posted"},
-			postID: {display: ""},
-			posterID: {display: ""}
-		});
-		const httpClient = new Crystalline.http();
+		(async function(){
+			Crystalline.init("topicList", []);
+			Crystalline.bind("#topic_list", "topicList");
+			Crystalline.format("topicList", {
+				title: {title: "Title", template: {tag: "a", class: "topicLink", href: "post_{{postID}}"}},
+				poster: {title: "Poster", template: {tag: "a", class: "posterLink", href: "poster_{{posterID}}"}},
+				replies: {title: "Replies"},
+				postDate: {title: "Posted"},
+				postID: {showTitle: false, showValue: false},
+				posterID: {showTitle: false, showValue: false}
+			});
+			const httpClient = new Crystalline.http();
 
-		httpClient.get("topic_list").then(function(data)
-		{
+			const data = await httpClient.get("topic_list");
 			Crystalline.set("topicList", JSON.parse(data.body));
 			Crystalline.data.topicList.unshift({title: "", replies: "", poster: "", postDate: ""});
-		})
-		.catch(function(err)
-		{
-			console.log(err);
-		});
 
+
+
+			//BELOW IS HOW IT LOOKS WITH PROMISE SYNTAX. GROSS!
+
+			// httpClient.get("topic_list").then(function(data)
+			// {
+			// 	Crystalline.set("topicList", JSON.parse(data.body));
+			// 	Crystalline.data.topicList.unshift({title: "", replies: "", poster: "", postDate: ""});
+			// })
+			// .catch(function(err)
+			// {
+			// 	console.log(err);
+			// });
+		})();
 	</script>
 	<style type="text/css">
 		*{

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Home</title>
+	<script type="text/javascript" src="crystalline.js"></script>
+	<script type="text/javascript">
+		(async function()
+		{
+			Crystalline.init("content", []);
+			Crystalline.bind("#content_area", "content");
+			Crystalline.format("content", {
+				message: {showTitle: false, template: {tag: "span", style: {color: "{{color}}"}}},
+				color: {showTitle: false, showValue: false}
+			});
+
+			let data = await Crystalline.http.get("doc_app_content");
+			Crystalline.set("content", JSON.parse(data.body));
+
+		})();
+	</script>
+	<style type="text/css">
+		
+	</style>
+</head>
+<body>
+	<div id="wrapper">
+		<table id="content_area"></table>
+	</div>
+</body>
+</html>

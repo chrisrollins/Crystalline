@@ -48,7 +48,7 @@ const Crystalline = (function()
 						{
 							value[func] = function(...args)
 							{
-								API[func].apply(this, [value, ...args]);
+								API[func].apply(this, [name, ...args]);
 							}
 						}
 					}

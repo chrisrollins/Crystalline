@@ -24,7 +24,7 @@
 
 			const data = await httpClient.get("topic_list");
 			Crystalline.data.topicList.set(JSON.parse(data.body));
-			console.log(Crystalline.data.topicList)
+			console.log(JSON.parse(data.body))
 
 
 

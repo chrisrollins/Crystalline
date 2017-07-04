@@ -30,15 +30,26 @@ const Crystalline = (function()
 					sessionStorage._CrSession = JSON.stringify(_data);
 					if(Array.isArray(value))
 					{
-						value.push = function(pushedVal)
+						for(const key in Array.prototype)
 						{
-							Array.prototype.push.call(value, pushedVal);
-							API_set(name, value);
-						},
-						value.unshift = function(prependedValue)
+							if(typeof Array.prototype[key] === "function")
+							{
+								value[key] = function(...args)
+								{
+									Array.prototype[key].apply(value, args);
+									API_set(name, value);
+								}
+							}
+						}
+					}
+					if(typeof value === "object")
+					{
+						for(let func of ["set", "get", "order", "format"])
 						{
-							Array.prototype.unshift.call(value, prependedValue);
-							API_set(name, value);
+							value[func] = function(...args)
+							{
+								API[func].apply(this, [value, ...args]);
+							}
 						}
 					}
 				},
@@ -53,6 +64,14 @@ const Crystalline = (function()
 				getFormat: function(name)
 				{
 					return (_data[name] || {formatRules:undefined}).formatRules;
+				},
+				setOrder: function(name, orderArr)
+				{
+					_data[name].orderArr = orderArr;
+				},
+				getOrder: function(name)
+				{
+					return (_data[name] || {orderArr:undefined}).orderArr;
 				},
 				get all()
 				{
@@ -158,6 +177,27 @@ const Crystalline = (function()
 
 		//UTILITY
 
+		const getProto = function(obj)
+		{
+			return (obj === null || obj === undefined) ? obj : Object.getPrototypeOf(obj);
+		};
+
+		const getArrayType = function(arr)
+		{
+			if(Array.isArray(arr))
+			{
+				const type = getProto(arr[0]);
+				for(const item of arr)
+				{
+					if(getProto(item) !== type)
+					{
+						return undefined;
+					}
+				}
+				return type;
+			}
+		};
+
 		const defineAllowedValues = function(obj, config, silent = true)
 		{
 			const errs = [];
@@ -207,7 +247,7 @@ const Crystalline = (function()
   					}
 				});
 			}
-		}
+		};
 
 		//END UTILITY
 
@@ -373,7 +413,7 @@ const Crystalline = (function()
 
 					if(Array.isArray(data))
 					{
-						const colNames = new Set();
+						const colNames = new Set(dataStorage.getOrder(name));
 						for(const item of data)
 						{
 							if(typeof item === "object" && !Array.isArray(item))
@@ -694,20 +734,15 @@ const Crystalline = (function()
 			return el;
 		}
 
-		function API_template(dataKey, HTMLStringOrElement)
+		function API_order(name, ...keys)
 		{
-			let str;
-			if(typeof HTMLStringOrElement === "string")
+			if(getArrayType(keys) === Array.prototype && keys.length === 1)
 			{
-				str = HTMLStringOrElement;
+				keys = keys[0];
 			}
-			else if(isHTMLElement(element))
+			if(getArrayType(keys) === String.prototype)
 			{
-				str = element.outerHTML;
-			}
-			else
-			{
-				warning(`Invalid template argument passed for the data key '${dataKey}'. It should be a string or html element.`);
+				dataStorage.setOrder(name, keys);
 			}
 		}
 
@@ -831,6 +866,7 @@ const Crystalline = (function()
 			set: Object.freeze(API_set),
 			get: Object.freeze(API_get),
 			bind: Object.freeze(API_bind),
+			order: Object.freeze(API_order),
 			format: Object.freeze(API_format),
 			eventListener: Object.freeze(API_eventListener),
 			createElement: Object.freeze(API_createElement),

@@ -760,7 +760,7 @@ const Crystalline = (function()
 
 		function API_format(name, rules)
 		{
-			if(typeof name === "string" && (Object.getPrototypeOf(rules) + "") === "[object Object]")
+			if(typeof name === "string" && Object.getPrototypeOf(rules) === Object.prototype)
 			{
 				dataStorage.setFormat(name, rules);
 			}

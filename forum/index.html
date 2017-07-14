@@ -15,11 +15,16 @@
 				postID: {showTitle: false, showValue: false},
 				posterID: {showTitle: false, showValue: false}
 			});
+			Crystalline.order("topicList", ["title", "poster", "postDate", "replies"]);
+
+			//Alternative syntax (works for set, get, order, format but not init)
+			//Crystalline.data.topicList.order(["title", "poster", "postDate", "replies"]);
+	
 			const httpClient = new Crystalline.http();
 
 			const data = await httpClient.get("topic_list");
-			Crystalline.set("topicList", JSON.parse(data.body));
-			Crystalline.data.topicList.unshift({title: "", replies: "", poster: "", postDate: ""});
+			Crystalline.data.topicList.set(JSON.parse(data.body));
+			console.log(JSON.parse(data.body))
 
 
 
@@ -28,7 +33,6 @@
 			// httpClient.get("topic_list").then(function(data)
 			// {
 			// 	Crystalline.set("topicList", JSON.parse(data.body));
-			// 	Crystalline.data.topicList.unshift({title: "", replies: "", poster: "", postDate: ""});
 			// })
 			// .catch(function(err)
 			// {

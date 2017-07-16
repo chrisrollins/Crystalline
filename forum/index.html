@@ -5,9 +5,9 @@
 	<script type="text/javascript" src="crystalline.js"></script>
 	<script type="text/javascript">
 		(async function(){
-			Crystalline.init("topicList", []);
-			Crystalline.bind("#topic_list", "topicList");
-			Crystalline.format("topicList", {
+			Crystalline.init("topicListData", []); //put a variable in the internal storage
+			Crystalline.bind("#topic_list", "topicListData");
+			Crystalline.format("topicListData", { //each column cell is the same element tag
 				title: {title: "Title", template: {tag: "a", class: "topicLink", href: "post_{{postID}}"}},
 				poster: {title: "Poster", template: {tag: "a", class: "posterLink", href: "poster_{{posterID}}"}},
 				replies: {title: "Replies"},
@@ -15,29 +15,25 @@
 				postID: {showTitle: false, showValue: false},
 				posterID: {showTitle: false, showValue: false}
 			});
-			Crystalline.order("topicList", ["title", "poster", "postDate", "replies"]);
+			Crystalline.order("topicListData", ["title", "poster", "postDate", "replies"]);
 
 			//Alternative syntax (works for set, get, order, format but not init)
-			//Crystalline.data.topicList.order(["title", "poster", "postDate", "replies"]);
-	
-			const httpClient = new Crystalline.http();
+			//Crystalline.data.topicListData.order(["title", "poster", "postDate", "replies"]);
 
-			const data = await httpClient.get("topic_list");
-			Crystalline.data.topicList.set(JSON.parse(data.body));
-			console.log(JSON.parse(data.body))
+			// const data = await Crystalline.http.get("get_topic_list");
+			// Crystalline.data.topicListData.set(JSON.parse(data.body));
 
 
+			//Below is how it looks with promise syntax
 
-			//BELOW IS HOW IT LOOKS WITH PROMISE SYNTAX. GROSS!
-
-			// httpClient.get("topic_list").then(function(data)
-			// {
-			// 	Crystalline.set("topicList", JSON.parse(data.body));
-			// })
-			// .catch(function(err)
-			// {
-			// 	console.log(err);
-			// });
+			Crystalline.http.get("get_topic_list").then(function(data)
+			{
+				Crystalline.set("topicListData", JSON.parse(data.body));
+			})
+			.catch(function(err)
+			{
+				console.log(err);
+			});
 		})();
 	</script>
 	<style type="text/css">

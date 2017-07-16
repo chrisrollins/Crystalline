@@ -109,7 +109,7 @@ const routes = {
 	"/" : "index.html",
 	"/forum" : "./forum/index.html",
 	"/doc_app" : "./docApp/index.html",
-	"/topic_list" : topicListController,
+	"/get_topic_list" : topicListController,
 	"/doc_app_content" : docContentController
 }
 

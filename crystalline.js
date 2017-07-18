@@ -15,11 +15,22 @@ const Crystalline = (function()
 		//SETUP
 		const dataStorage = function()
 		{
-			if(!sessionStorage._CrSession)
+			if(!localStorage._CrSession)
 			{
-				sessionStorage._CrSession = "{}";
+				localStorage._CrSession = "{}";
 			}
-			const _data = JSON.parse(sessionStorage._CrSession);
+			const _data = JSON.parse(localStorage._CrSession);
+
+			const sessionCounter = {
+				get count()
+				{
+					return (parseInt(localStorage._crSessionCounter) || 0);
+				},
+				set count(value)
+				{
+					localStorage._crSessionCounter = value;
+				}
+			};
 
 			return Object.freeze(
 			{
@@ -27,10 +38,11 @@ const Crystalline = (function()
 				{
 					_data[name] = (_data[name] || {});
 					_data[name].value = value;
-					sessionStorage._CrSession = JSON.stringify(_data);
+					localStorage._CrSession = JSON.stringify(_data);
 					if(Array.isArray(value))
 					{
-						for(const key in Array.prototype)
+						const keys = Object.getOwnPropertyNames(Array.prototype);
+						for(const key of keys)
 						{
 							if(typeof Array.prototype[key] === "function")
 							{
@@ -57,6 +69,10 @@ const Crystalline = (function()
 				{
 					return _data[name].value;
 				},
+				clearAll: function()
+				{
+					localStorage._CrSession = "{}";
+				},
 				setFormat: function(name, rules)
 				{
 					_data[name].formatRules = rules;
@@ -72,6 +88,14 @@ const Crystalline = (function()
 				getOrder: function(name)
 				{
 					return (_data[name] || {orderArr:undefined}).orderArr;
+				},
+				incrementSessionCounter()
+				{
+					return ++sessionCounter.count;
+				},
+				decrementSessionCounter()
+				{
+					return --sessionCounter.count;
 				},
 				get all()
 				{
@@ -168,9 +192,22 @@ const Crystalline = (function()
 			});
 		}
 
+		//do this before even loading
+		dataStorage.incrementSessionCounter();
+		console.log(localStorage._crSessionCounter);
+
 		window.onload = function()
 		{
 			loaded = true;
+		};
+
+		window.onunload = function()
+		{
+			if(dataStorage.decrementSessionCounter() === 0)
+			{
+				dataStorage.clearAll();
+			}
+			console.log(localStorage._crSessionCounter);
 		};
 
 		//END SETUP

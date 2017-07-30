@@ -4,6 +4,7 @@ const Crystalline = (function()
 	const libName = "Crystalline"
 	const nameBindings = {};
 	const keysInitialized = {};
+	const globalFlags = {};
 	let CrElementCount = 0;
 	let loaded = false;
 	const API = {
@@ -36,7 +37,7 @@ const Crystalline = (function()
 			{
 				set: function(name, value)
 				{
-					_data[name] = (_data[name] || {});
+					_data[name] = (_data[name] || new Object(null));
 					_data[name].value = value;
 					localStorage._CrSession = JSON.stringify(_data);
 					if(Array.isArray(value))
@@ -67,11 +68,13 @@ const Crystalline = (function()
 				},
 				get: function(name, value)
 				{
-					return _data[name].value;
+					return (_data[name] || {}).value;
 				},
 				clearAll: function()
 				{
 					localStorage._CrSession = "{}";
+					for (const prop in _data)
+						{ delete _data[prop]; }
 				},
 				setFormat: function(name, rules)
 				{
@@ -91,11 +94,15 @@ const Crystalline = (function()
 				},
 				incrementSessionCounter()
 				{
-					return ++sessionCounter.count;
+					const before = sessionCounter.count++;
+					const after = sessionCounter.count;
+					return {before: before, after: after};
 				},
 				decrementSessionCounter()
 				{
-					return --sessionCounter.count;
+					const before = sessionCounter.count--;
+					const after = sessionCounter.count;
+					return {before: before, after: after};
 				},
 				get all()
 				{
@@ -103,6 +110,21 @@ const Crystalline = (function()
 				}
 			});
 		}();
+
+		const debugMsg = function(msg)
+		{
+			if(globalFlags.debugMode)
+			{
+				if(!Array.isArray(msg))
+				{
+					msg = [msg];
+				}
+				for(const m of msg)
+				{
+					console.warn(`${libName} - DEBUG: ${m}`);
+				}
+			}
+		};
 
 		const warning = function(msg)
 		{
@@ -192,22 +214,20 @@ const Crystalline = (function()
 			});
 		}
 
-		//do this before even loading
-		dataStorage.incrementSessionCounter();
-		console.log(localStorage._crSessionCounter);
+		if(dataStorage.incrementSessionCounter().before === 0 && sessionStorage._CrThisSession !== "active")
+		{
+			dataStorage.clearAll();
+			sessionStorage._CrThisSession = "active";
+		}
 
 		window.onload = function()
 		{
 			loaded = true;
 		};
 
-		window.onunload = function()
+		window.onunload = function(e)
 		{
-			if(dataStorage.decrementSessionCounter() === 0)
-			{
-				dataStorage.clearAll();
-			}
-			console.log(localStorage._crSessionCounter);
+			dataStorage.decrementSessionCounter();
 		};
 
 		//END SETUP
@@ -355,7 +375,7 @@ const Crystalline = (function()
 			{
 				if(data === undefined || data === null)
 				{
-					warning(`The data bound to <${element.nodeName.toLowerCase()}> tag with id '${element.id}' is undefined.`);
+					debugMsg(`The data bound to <${element.nodeName.toLowerCase()}> tag with id '${element.id}' is undefined.`);
 					return;
 				}
 				else if(isHTMLElement(data))
@@ -727,6 +747,14 @@ const Crystalline = (function()
 
 		//API FUNCTIONS
 
+		function API_debugMode(enabled)
+		{
+			if(enabled === true || enabled === false)
+			{
+				debugMode = enabled;
+			}
+		}
+
 		function API_createElementFromData(tagName, data, properties)
 		{
 			let el = API_createElement(tagName, properties);
@@ -908,7 +936,8 @@ const Crystalline = (function()
 			eventListener: Object.freeze(API_eventListener),
 			createElement: Object.freeze(API_createElement),
 			createElementFromData: Object.freeze(API_createElementFromData),
-			http: Object.freeze(API_http)
+			http: Object.freeze(API_http),
+			debugMode: Object.freeze(API_debugMode)
 		}));
 	
 	})();

@@ -37,7 +37,7 @@ const Crystalline = (function()
 			{
 				set: function(name, value)
 				{
-					_data[name] = (_data[name] || new Object(null));
+					_data[name] = (_data[name] || Object.create(null));
 					_data[name].value = value;
 					localStorage._CrSession = JSON.stringify(_data);
 					if(Array.isArray(value))
@@ -635,7 +635,6 @@ const Crystalline = (function()
 		{
 			return obj instanceof Promise;
 		}
-
 		//END INTERNAL FUNCTIONS
 
 

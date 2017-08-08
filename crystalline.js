@@ -635,6 +635,7 @@ const Crystalline = (function()
 		{
 			return obj instanceof Promise;
 		}
+
 		//END INTERNAL FUNCTIONS
 
 
@@ -836,31 +837,61 @@ const Crystalline = (function()
 
 		function API_init(name, value)
 		{
-			if(!keysInitialized[name])
+			const typeCheck = getProto(name);
+			if(typeCheck === Object.prototype || typeCheck === null)
 			{
-				API_set(name, value);
+				for(const key in name)
+				{
+					API_init(key, name[key]);
+				}
+			}
+			else if(typeof name === "string")
+			{
+				if(!keysInitialized[name])
+				{
+					API_set(name, value);
+				}
+			}
+			else
+			{
+				error("First argument of init should either be a string or an object.");
 			}
 		}
 
 		function API_set(name, value)
 		{
-			dataStorage.set(name, value);
-			if(!keysInitialized[name])
+			const typeCheck = getProto(name);
+			if(typeCheck === Object.prototype || typeCheck === null)
 			{
-				keysInitialized[name]= true;
-				Object.defineProperty(API.data, name,
+				for(const key in name)
 				{
-					set: function(value)
-					{
-						API_set(name, value);
-					},
-					get: function()
-					{
-						return API_get(name);
-					}
-				});
+					API_set(key, name[key]);
+				}
 			}
-			refreshName(name);
+			else if(typeof name === "string")
+			{
+				dataStorage.set(name, value);
+				if(!keysInitialized[name])
+				{
+					keysInitialized[name]= true;
+					Object.defineProperty(API.data, name,
+					{
+						set: function(value)
+						{
+							API_set(name, value);
+						},
+						get: function()
+						{
+							return API_get(name);
+						}
+					});
+				}
+				refreshName(name);
+			}
+			else
+			{
+				error("First argument of init should either be a string or an object.");
+			}
 		}
 
 		function API_get(name)

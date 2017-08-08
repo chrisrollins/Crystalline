@@ -1,3 +1,5 @@
+console.log(arguments[4]);
+
 const port = 5000;
 const http = require("http");
 const fs = require("fs");

@@ -660,18 +660,18 @@ const Crystalline = (function()
 					}
 					else
 					{
-						warning(`Crystalline.http is implemented with the fetch API which does not allow GET or HEAD requests to have a body so the body for this request was discarded.`);
+						warning(`Crystalline.http does not allow GET or HEAD requests to have a body. The body for this request was discarded.`);
 					}
 				}
 				fetchOptions.method = (method || thisRef.options.method);
 
-				return new Promise(function(resolve, reject)
+				const prom = new Promise(function(resolve, reject)
 				{
 					fetch(thisRef.options.baseURL + path, fetchOptions).then(function(res)
 					{
 						res.text().then(function(data)
 						{
-							resolve({status: res.status, headers: res.headers, statusText: res.statusText, url: res.url, body: data});
+							resolve(JSON.parse(data));
 						})
 						.catch(function(err)
 						{
@@ -681,8 +681,9 @@ const Crystalline = (function()
 					.catch(function(err){
 						reject(err);
 					});
-
 				});
+
+				return prom;
 			});
 			const generateOptions = function()
 			{

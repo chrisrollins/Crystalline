@@ -28,11 +28,11 @@
 
 			Crystalline.http.get("get_topic_list").then(function(data)
 			{
-				Crystalline.set("topicListData", JSON.parse(data.body));
+				Crystalline.set("topicListData", data);
 			})
 			.catch(function(err)
 			{
-				console.log(err);
+				console.error(err);
 			});
 		})();
 	</script>

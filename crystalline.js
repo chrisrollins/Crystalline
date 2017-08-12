@@ -700,13 +700,19 @@ const Crystalline = (function()
 						res.text().then(function(data)
 						{
 							let result;
-							try
-								{ result = JSON.parse(data); }
-							catch(e)
-								{ result = data; }
-								
-							if(typeof result !== "object")
-								{ result += ""; }
+
+							if(data[0] === "{" || data[0] === "[")
+							{
+								try { result = JSON.parse(data); }
+								catch(e)
+								{
+									warning(`malformed JSON from server response: ${data}`);
+									result = data;
+								}
+							}
+							else
+							{ result = data; }
+
 							resolve(result);
 						})
 						.catch(function(err)

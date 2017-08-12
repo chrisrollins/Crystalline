@@ -703,7 +703,10 @@ const Crystalline = (function()
 							try
 								{ result = JSON.parse(data); }
 							catch(e)
-								{ result = data + ""; }
+								{ result = data; }
+								
+							if(typeof result !== "object")
+								{ result += ""; }
 							resolve(result);
 						})
 						.catch(function(err)

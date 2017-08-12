@@ -11,6 +11,82 @@ const Crystalline = (function()
 		data:{}
 	};
 
+	//UTILITY
+
+	const getProto = function(obj)
+	{
+		return (obj === null || obj === undefined) ? obj : Object.getPrototypeOf(obj);
+	};
+
+	const getArrayType = function(arr)
+	{
+		if(Array.isArray(arr))
+		{
+			const type = getProto(arr[0]);
+			for(const item of arr)
+			{
+				if(getProto(item) !== type)
+				{
+					return undefined;
+				}
+			}
+			return type;
+		}
+	};
+
+	const defineAllowedValues = function(obj, config, silent = true)
+	{
+		const errs = [];
+		if(typeof obj !== "object" && typeof obj !== "function")
+		{
+			errs.push("obj is not valid type.")
+		}
+		for(const key in config)
+		{
+			if(!Array.isArray(config[key]))
+			{
+				errs.push("Improper config format for defining object allowed values.");
+			}
+		}
+		if(errs.length > 0)
+		{
+			if(!silent)
+			{
+				error(errs);
+			}
+			return;
+		}
+
+		for(const key in config)
+		{
+			let storedVal;
+			Object.defineProperty(obj, key,
+			{
+				get: function()
+				{
+					return storedVal;
+				},
+					set: function(newVal)
+					{
+						for(const allowed of config[key])
+						{
+							if(newVal === allowed)
+							{
+								storedVal = newVal;
+								break;
+							}
+						}
+						if(!silent && storedVal !== newVal)
+						{
+							error(`Could not set property '${key}' of ${obj} to value ${newVal}. Allowed values: ${config[key]}`);
+						}
+					}
+			});
+		}
+	};
+
+	//END UTILITY
+
 	return (function()
 	{
 		//SETUP
@@ -231,82 +307,6 @@ const Crystalline = (function()
 		};
 
 		//END SETUP
-
-		//UTILITY
-
-		const getProto = function(obj)
-		{
-			return (obj === null || obj === undefined) ? obj : Object.getPrototypeOf(obj);
-		};
-
-		const getArrayType = function(arr)
-		{
-			if(Array.isArray(arr))
-			{
-				const type = getProto(arr[0]);
-				for(const item of arr)
-				{
-					if(getProto(item) !== type)
-					{
-						return undefined;
-					}
-				}
-				return type;
-			}
-		};
-
-		const defineAllowedValues = function(obj, config, silent = true)
-		{
-			const errs = [];
-			if(typeof obj !== "object" && typeof obj !== "function")
-			{
-				errs.push("obj is not valid type.")
-			}
-			for(const key in config)
-			{
-				if(!Array.isArray(config[key]))
-				{
-					errs.push("Improper config format for defining object allowed values.");
-				}
-			}
-			if(errs.length > 0)
-			{
-				if(!silent)
-				{
-					error(errs);
-				}
-				return;
-			}
-
-			for(const key in config)
-			{
-				let storedVal;
-				Object.defineProperty(obj, key,
-				{
-					get: function()
-					{
-						return storedVal;
-					},
-  					set: function(newVal)
-  					{
-  						for(const allowed of config[key])
-  						{
-  							if(newVal === allowed)
-  							{
-  								storedVal = newVal;
-  								break;
-  							}
-  						}
-  						if(!silent && storedVal !== newVal)
-  						{
-  							error(`Could not set property '${key}' of ${obj} to value ${newVal}. Allowed values: ${config[key]}`);
-  						}
-  					}
-				});
-			}
-		};
-
-		//END UTILITY
 
 		//INTERNAL FUNCTIONS
 
@@ -643,48 +643,6 @@ const Crystalline = (function()
 
 		const API_http = (function()
 		{
-			const httpSend = Object.freeze(function(method, path)
-			{
-				const thisRef = this;
-				const fetchOptions = {};
-				for(const key of ["mode", "headers", "credentials", "cache", "redirect", "referrer", "integrity"])
-				{
-					fetchOptions[key] = thisRef.options[key];
-				}
-				
-				if(thisRef.options.body)
-				{
-					if(method.toUpperCase() !== "GET" && method.toUpperCase() !== "HEAD")
-					{
-						fetchOptions.body = thisRef.options.body;
-					}
-					else
-					{
-						warning(`Crystalline.http does not allow GET or HEAD requests to have a body. The body for this request was discarded.`);
-					}
-				}
-				fetchOptions.method = (method || thisRef.options.method);
-
-				const prom = new Promise(function(resolve, reject)
-				{
-					fetch(thisRef.options.baseURL + path, fetchOptions).then(function(res)
-					{
-						res.text().then(function(data)
-						{
-							resolve(JSON.parse(data));
-						})
-						.catch(function(err)
-						{
-							reject(err);
-						});
-					})
-					.catch(function(err){
-						reject(err);
-					});
-				});
-
-				return prom;
-			});
 			const generateOptions = function()
 			{
 				const options = {
@@ -711,6 +669,56 @@ const Crystalline = (function()
 
 				return options;
 			};
+
+			const httpSend = Object.freeze(function(method, path, options)
+			{
+				const thisRef = this;
+				const fetchOptions = {};
+				const optionsSource = (typeof options === "object") ? Object.assign(generateOptions(), options) : thisRef.options;
+				for(const key of ["mode", "headers", "credentials", "cache", "redirect", "referrer", "integrity"])
+				{
+					fetchOptions[key] = optionsSource[key];
+				}
+				
+				if(optionsSource.body)
+				{
+					if(method.toUpperCase() !== "GET" && method.toUpperCase() !== "HEAD")
+					{
+						fetchOptions.body = optionsSource.body;
+					}
+					else
+					{
+						warning("GET or HEAD requests cannot have a body. The body for this request was discarded.");
+					}
+				}
+				fetchOptions.method = (method || optionsSource.method || "GET");
+
+				const prom = new Promise(function(resolve, reject)
+				{
+					fetch(optionsSource.baseURL + path, fetchOptions).then(function(res)
+					{
+						res.text().then(function(data)
+						{
+							let result;
+							try
+								{ result = JSON.parse(data); }
+							catch(e)
+								{ result = data; }
+							resolve(result);
+						})
+						.catch(function(err)
+						{
+							reject(err);
+						});
+					})
+					.catch(function(err){
+						reject(err);
+					});
+				});
+
+				return prom;
+			});
+			
 
 			const applyMethods = function(obj)
 			{

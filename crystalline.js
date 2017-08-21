@@ -371,7 +371,9 @@ const Crystalline = (function()
 				return;
 			}
 			clearElement(element);
-			const defaultFunc = function()
+
+
+			function defaultFunc()
 			{
 				if(data === undefined || data === null)
 				{

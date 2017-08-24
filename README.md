@@ -71,3 +71,37 @@ __Parameters__
 tagName: the tag for the new element. (eg. "div")  
 data: a value to render in the element  
 properties: the properties for the new element.  
+  
+  
+__Crystalline.http__  
+A simple interface for performing HTTP calls. It can be used statically and/or instantiated with the 'new' keyword. When used statically, there is a default options configuration which will be listed below. Individual requests can be passed an object to specify a different configuration. When instantiated, options can be passed to configure the default options for that particular instance.  
+Methods:  
+__http.get__(_string_ __path__, _object_ __options__)  
+__http.post__(_string_ __path__, _object_ __options__)  
+__http.put__(_string_ __path__, _object_ __options__)  
+__http.patch__(_string_ __path__, _object_ __options__)  
+__http.delete__(_string_ __path__, _object_ __options__)  
+__http.request__(_string_ __method__, _string_ __path__, _object_ __options__)  
+These methods only differ by the HTTP verb.  
+__Parameters__  
+method (http.request only): the HTTP verb to use for this request.
+path: the url to make the request to.  
+options: An object with options. See the fetch API for details: https://developer.mozilla.org/en-US/docs/Web/API/Request  
+Note: Options must conform to the values accepted by the fetch API with the exception of the baseURL option.  
+  
+The http methods return a promise which resolves to the data from the request body. For more detailed use cases, use the fetch API or a dedicated HTTP library. The data will be assumed to be JSON and automatically parsed if it is a string which starts with { or [. Standalone primitive values, although technically valid JSON, will not be parsed and will be returned as a string.  
+  
+Default Options: {
+					//additional options
+					baseURL: "",
+					//fetch API options
+					method: "GET", //GET, POST, PUT, PATCH, DELETE, etc...
+					headers: {},
+					mode: "cors", //cors, no-cors, same-origin, navigate
+					credentials: "omit", //omit, same-origin, include
+					cache: "default", //default, no-store, reload, force-cache, only-if-cache
+					redirect: "follow", //follow, error, manual
+					referrer: "about:client", //about:client, no-referrer, <URL>
+					integrity: "",
+					body: undefined,
+				}

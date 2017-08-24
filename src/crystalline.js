@@ -66,21 +66,21 @@ const Crystalline = (function()
 				{
 					return storedVal;
 				},
-					set: function(newVal)
+				set: function(newVal)
+				{
+					for(const allowed of config[key])
 					{
-						for(const allowed of config[key])
+						if(newVal === allowed)
 						{
-							if(newVal === allowed)
-							{
-								storedVal = newVal;
-								break;
-							}
-						}
-						if(!silent && storedVal !== newVal)
-						{
-							error(`Could not set property '${key}' of ${obj} to value ${newVal}. Allowed values: ${config[key]}`);
+							storedVal = newVal;
+							break;
 						}
 					}
+					if(!silent && storedVal !== newVal)
+					{
+						error(`Could not set property '${key}' of ${obj} to value ${newVal}. Allowed values: ${config[key]}`);
+					}
+				}
 			});
 		}
 	};

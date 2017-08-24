@@ -89,7 +89,7 @@ path: the url to make the request to.
 options: An object with options. See the fetch API for details: https://developer.mozilla.org/en-US/docs/Web/API/Request  
 Note: Options must conform to the values accepted by the fetch API with the exception of the baseURL option.  
   
-The http methods return a promise which resolves to the data from the request body. For more detailed use cases, use the fetch API or a dedicated HTTP library. The data will be assumed to be JSON and automatically parsed if it is a string which starts with { or [. Standalone primitive values, although technically valid JSON, will not be parsed and will be returned as a string.  
+The functions return a promise which resolves to the data from the request body. For more detailed use cases, use the fetch API or a dedicated HTTP library. The data will be assumed to be JSON and automatically parsed if it is a string which starts with { or [. Standalone primitive values, although technically valid JSON, will not be parsed and will be returned as a string.  
   
 Default Options: {  
 //additional options  

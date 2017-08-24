@@ -92,16 +92,16 @@ Note: Options must conform to the values accepted by the fetch API with the exce
 The http methods return a promise which resolves to the data from the request body. For more detailed use cases, use the fetch API or a dedicated HTTP library. The data will be assumed to be JSON and automatically parsed if it is a string which starts with { or [. Standalone primitive values, although technically valid JSON, will not be parsed and will be returned as a string.  
   
 Default Options: {
-					//additional options
-					baseURL: "",
-					//fetch API options
-					method: "GET", //GET, POST, PUT, PATCH, DELETE, etc...
-					headers: {},
-					mode: "cors", //cors, no-cors, same-origin, navigate
-					credentials: "omit", //omit, same-origin, include
-					cache: "default", //default, no-store, reload, force-cache, only-if-cache
-					redirect: "follow", //follow, error, manual
-					referrer: "about:client", //about:client, no-referrer, <URL>
-					integrity: "",
-					body: undefined,
-				}
+//additional options  
+baseURL: "",  
+//fetch API options  
+method: "GET", //GET, POST, PUT, PATCH, DELETE, etc...  
+headers: {},  
+mode: "cors", //cors, no-cors, same-origin, navigate  
+credentials: "omit", //omit, same-origin, include  
+cache: "default", //default, no-store, reload, force-cache, only-if-cache  
+redirect: "follow", //follow, error, manual  
+referrer: "about:client", //about:client, no-referrer, <URL>  
+integrity: "",  
+body: undefined,  
+}

@@ -36,10 +36,10 @@ __Parameters__
 elementOrSelector: Either a direct reference to an element, or the selector string for an element (eg. "#myDivID")  
 name: the data key to bind the element to.  
   
-__Crystalline.bind__(_string_|_HTMLElement_ __elementOrSelector__)__.out__(_string_ __name__)  
+__Crystalline.bind__(_string_|_HTMLElement_|_Array_|_NodeList_ __elementOrSelector__)__.out__(_string_ __name__)  
 Only out binds the element, meaning that the element can change the data, but the data being changed will not change the element's value. Only used for elements that take user input.  
   
-__Crystalline.bind__(_string_|_HTMLElement_ __elementOrSelector__)__.in__(_string_ __name__)  
+__Crystalline.bind__(_string_|_HTMLElement_|_Array_|_NodeList_ __elementOrSelector__)__.in__(_string_ __name__)  
 Only in binds the element, meaning that changes to the data will change the element's displayed data, but changes to the element's value will not change the data. Only has any significance when used on elements that take user input.  
   
 __Note:__ the .in and .out functions can be chained in either order  

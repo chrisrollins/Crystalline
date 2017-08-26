@@ -342,7 +342,7 @@ return function () {
 
 		var _arr2 = ["onabort", "onafterprint", "onanimationcancel", "onanimationend", "onanimationiteration", "onappinstalled", "onauxclick", "onbeforeinstallprompt", "onbeforeprint", "onbeforeunload", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "ondevicelight", "ondevicemotion", "ondeviceorientation", "ondeviceorientationabsolute", "ondeviceproximity", "ondragdrop", "onerror", "onfocus", "ongotpointercapture", "onhashchange", "oninput", "onkeydown", "onkeypress", "onkeyup", "onlanguagechange", "onload", "onloadend", "onloadstart", "onlostpointercapture", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onmozbeforepaint", "onpaint", "onpointercancel", "onpointerdown", "onpointerenter", "onpointerleave", "onpointermove", "onpointerout", "onpointerover", "onpointerup", "onpopstate", "onrejectionhandled", "onreset", "onresize", "onscroll", "onselect", "onselectionchange", "onselectstart", "onstorage", "onsubmit", "ontouchcancel", "ontouchmove", "ontouchstart", "ontransitioncancel", "ontransitionend", "onunhandledrejection", "onunload", "onuserproximity", "onvrdisplayconnected", "onvrdisplaydisconnected", "onvrdisplaypresentchange"];
 
-		var _loop4 = function _loop4() {
+		var _loop5 = function _loop5() {
 			var event = _arr2[_i2];
 			var funcs = [];
 
@@ -357,13 +357,13 @@ return function () {
 
 			window[event] = function (e) {
 				var result = void 0;
-				var _iteratorNormalCompletion15 = true;
-				var _didIteratorError15 = false;
-				var _iteratorError15 = undefined;
+				var _iteratorNormalCompletion17 = true;
+				var _didIteratorError17 = false;
+				var _iteratorError17 = undefined;
 
 				try {
-					for (var _iterator15 = funcs[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
-						var f = _step15.value;
+					for (var _iterator17 = funcs[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
+						var f = _step17.value;
 
 						var fres = f(e);
 						if (fres !== undefined) {
@@ -371,16 +371,16 @@ return function () {
 						}
 					}
 				} catch (err) {
-					_didIteratorError15 = true;
-					_iteratorError15 = err;
+					_didIteratorError17 = true;
+					_iteratorError17 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion15 && _iterator15.return) {
-							_iterator15.return();
+						if (!_iteratorNormalCompletion17 && _iterator17.return) {
+							_iterator17.return();
 						}
 					} finally {
-						if (_didIteratorError15) {
-							throw _iteratorError15;
+						if (_didIteratorError17) {
+							throw _iteratorError17;
 						}
 					}
 				}
@@ -396,13 +396,13 @@ return function () {
 						f[_key12] = arguments[_key12];
 					}
 
-					var _iteratorNormalCompletion16 = true;
-					var _didIteratorError16 = false;
-					var _iteratorError16 = undefined;
+					var _iteratorNormalCompletion18 = true;
+					var _didIteratorError18 = false;
+					var _iteratorError18 = undefined;
 
 					try {
-						for (var _iterator16 = f[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
-							var _func = _step16.value;
+						for (var _iterator18 = f[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
+							var _func = _step18.value;
 
 							if (typeof _func === "function") {
 								funcs.push(_func);
@@ -411,16 +411,16 @@ return function () {
 							}
 						}
 					} catch (err) {
-						_didIteratorError16 = true;
-						_iteratorError16 = err;
+						_didIteratorError18 = true;
+						_iteratorError18 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion16 && _iterator16.return) {
-								_iterator16.return();
+							if (!_iteratorNormalCompletion18 && _iterator18.return) {
+								_iterator18.return();
 							}
 						} finally {
-							if (_didIteratorError16) {
-								throw _iteratorError16;
+							if (_didIteratorError18) {
+								throw _iteratorError18;
 							}
 						}
 					}
@@ -429,7 +429,7 @@ return function () {
 		};
 
 		for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-			_loop4();
+			_loop5();
 		}
 
 		if (dataStorage.incrementSessionCounter().before === 0 && sessionStorage._CrThisSession !== "active") {
@@ -1076,44 +1076,88 @@ return function () {
 		}
 
 		function API_bind(elementOrSelector, name) {
-			var DOMelement = elementOrSelector;
-			var DOMElementDirectRef = DOMelement;
-			if (!isHTMLElement(DOMelement)) {
-				delayUntilLoad(function (arg) {
-					DOMElementDirectRef = document.querySelector(DOMelement);
-				});
-			}
 			if (name !== undefined) {
-				delayUntilLoad(function (arg) {
-					if (isTagOutBindable(DOMElementDirectRef.nodeName)) {
-						API_bind(DOMelement).out(name);
+				API_bind(elementOrSelector).out(name).in(name);
+			}
+
+			var funcs = Object.freeze({
+				in: Object.freeze(inBind.bind(undefined, elementOrSelector)),
+				out: Object.freeze(outBind.bind(undefined, elementOrSelector))
+			});
+
+			function inBind(_elements, dataName) {
+				delayUntilLoad(function () {
+					var elements = typeof _elements === "string" ? document.querySelectorAll(_elements) : _elements instanceof Array || _elements instanceof NodeList ? _elements : [_elements];
+					var _iteratorNormalCompletion15 = true;
+					var _didIteratorError15 = false;
+					var _iteratorError15 = undefined;
+
+					try {
+						for (var _iterator15 = elements[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+							var el = _step15.value;
+
+							(nameBindings[dataName] || (nameBindings[dataName] = [])).push(el);
+							el.CrNameBind = dataName;
+							refreshElement(el);
+						}
+					} catch (err) {
+						_didIteratorError15 = true;
+						_iteratorError15 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion15 && _iterator15.return) {
+								_iterator15.return();
+							}
+						} finally {
+							if (_didIteratorError15) {
+								throw _iteratorError15;
+							}
+						}
 					}
 				});
-
-				return API_bind(DOMelement).in(name);
-			} else {
-				return {
-					in: function _in(name) {
-						delayUntilLoad(function (arg) {
-							(nameBindings[name] || (nameBindings[name] = [])).push(DOMElementDirectRef);
-							DOMElementDirectRef.CrNameBind = name;
-							refreshElement(DOMElementDirectRef);
-						});
-					},
-					out: function out(name) {
-						delayUntilLoad(function (arg) {
-							if (isTagOutBindable(DOMElementDirectRef.nodeName)) {
-								DOMElementDirectRef.oninput = function () {
-									API_set(name, DOMElementDirectRef.value);
-								};
-							} else {
-								warning("out binding is not available for " + DOMelement + " because it doesn't take user input.");
-							}
-						});
-						return API_bind;
-					}
-				};
+				return funcs;
 			}
+
+			function outBind(_elements, dataName) {
+				delayUntilLoad(function () {
+					var elements = typeof _elements === "string" ? document.querySelectorAll(_elements) : _elements instanceof Array || _elements instanceof NodeList ? _elements : [_elements];
+					var _iteratorNormalCompletion16 = true;
+					var _didIteratorError16 = false;
+					var _iteratorError16 = undefined;
+
+					try {
+						var _loop4 = function _loop4() {
+							var el = _step16.value;
+
+							if (isTagOutBindable(el.nodeName)) {
+								el.oninput = function () {
+									API_set(dataName, el.value);
+								};
+							}
+						};
+
+						for (var _iterator16 = elements[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+							_loop4();
+						}
+					} catch (err) {
+						_didIteratorError16 = true;
+						_iteratorError16 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion16 && _iterator16.return) {
+								_iterator16.return();
+							}
+						} finally {
+							if (_didIteratorError16) {
+								throw _iteratorError16;
+							}
+						}
+					}
+				});
+				return funcs;
+			}
+
+			return funcs;
 		}
 
 		return Object.freeze(Object.assign(API, {

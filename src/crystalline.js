@@ -921,59 +921,51 @@ const Crystalline = (function()
 
 		function API_bind(elementOrSelector, name)
 		{
-			const DOMelement = elementOrSelector;
-			let DOMElementDirectRef = DOMelement;
-			if(!isHTMLElement(DOMelement))
-			{
-				delayUntilLoad(function(arg)
-				{
-					DOMElementDirectRef = document.querySelector(DOMelement);
-				});
-			}
 			if(name !== undefined)
 			{
-				delayUntilLoad(function(arg)
+				API_bind(elementOrSelector).out(name).in(name);
+			}
+
+			const funcs = Object.freeze({
+				in: Object.freeze(inBind.bind(undefined, elementOrSelector)),
+				out: Object.freeze(outBind.bind(undefined, elementOrSelector))
+			})
+			
+			function inBind(_elements, dataName)
+			{
+				delayUntilLoad(function()
 				{
-					if(isTagOutBindable(DOMElementDirectRef.nodeName))
+					const elements = (typeof _elements === "string") ? document.querySelectorAll(_elements) : (_elements instanceof Array || _elements instanceof NodeList) ? _elements : [_elements];
+					for(let el of elements)
 					{
-						API_bind(DOMelement).out(name);
+						( nameBindings[dataName] || (nameBindings[dataName] = []) ).push(el);
+						el.CrNameBind = dataName;
+						refreshElement(el);
 					}
 				});
+				return funcs;
+			}
 
-				return API_bind(DOMelement).in(name);
-			}
-			else
+			function outBind(_elements, dataName)
 			{
-				return{
-					in: function(name)
+				delayUntilLoad(function()
+				{
+					const elements = (typeof _elements === "string") ? document.querySelectorAll(_elements) : (_elements instanceof Array || _elements instanceof NodeList) ? _elements : [_elements];
+					for(let el of elements)
 					{
-						delayUntilLoad(function(arg)
+						if(isTagOutBindable(el.nodeName))
 						{
-							( nameBindings[name] || (nameBindings[name] = []) ).push(DOMElementDirectRef);
-							DOMElementDirectRef.CrNameBind = name;
-							refreshElement(DOMElementDirectRef);
-						});
-					},
-					out: function(name)
-					{
-						delayUntilLoad(function(arg)
-						{
-							if(isTagOutBindable(DOMElementDirectRef.nodeName))
+							el.oninput = function()
 							{
-								DOMElementDirectRef.oninput = function()
-								{
-									API_set(name, DOMElementDirectRef.value);
-								}
+								API_set(dataName, el.value);
 							}
-							else
-							{
-								warning(`out binding is not available for ${DOMelement} because it doesn't take user input.`);
-							}
-						});
-						return API_bind;
+						}
 					}
-				}
+				});
+				return funcs;
 			}
+
+			return funcs;
 		}
 
 		return Object.freeze(Object.assign(API, {

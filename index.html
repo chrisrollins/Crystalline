@@ -47,7 +47,7 @@
 
 		Crystalline.bind("#testContent", "userInput");
 		Crystalline.bind("#testInput").out("userInput");
-		Crystalline.bind("#arrayHolder", "testArray");
+		Crystalline.bind(".arrayHolder", "testArray");
 		Crystalline.bind("#TwoDArrTest", "2DArr");
 		Crystalline.bind("#objTest", "objectArr");
 
@@ -87,13 +87,22 @@
 		#wrapper, #wrapper div {
 			margin: 3%;
 		}
+		.arrayHolder
+		{
+			display: inline-block;
+		}
 	</style>
 </head>
 <body>
 
 <div id="wrapper">
 	<div>
-		<ul id="arrayHolder">
+		<ul class="arrayHolder">
+		</ul>
+	</div>
+
+	<div>
+		<ul class="arrayHolder">
 		</ul>
 	</div>
 

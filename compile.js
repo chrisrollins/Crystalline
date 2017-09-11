@@ -24,7 +24,8 @@ console.log("Compiling: ".padEnd(30) + timeAction(function(){
 }) );
 
 console.log("Additional modifications: ".padEnd(30) + timeAction(function(){
-	code = `var Crystalline = (function(){\n${(result.code).replace("var Crystalline = ", "return ")} })();`;
+	// code = `var Crystalline = (function(){\n${(result.code).replace("var Crystalline = ", "return ")} })();`;
+	code = `(function(){\n${result.code}\n})();`
 }) );
 
 console.log("Writing output file: ".padEnd(30) + timeAction(function(){

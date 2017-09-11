@@ -21,6 +21,18 @@ const Crystalline = (function()
 			return (obj === null || obj === undefined) ? obj : Object.getPrototypeOf(obj);
 		};
 
+		const copy = function(val)
+		{
+			let result;
+			if(val === null || val === undefined)
+				{ result = val; }
+			else if(typeof val === "object")
+				{ result = Object.assign(Object.create(getProto(val)), val); }
+			else if(typeof val === "function")
+				{ result = val.bind(this); }
+			return result;
+		};
+
 		const getArrayType = function(arr)
 		{
 			if(Array.isArray(arr))
@@ -145,7 +157,7 @@ const Crystalline = (function()
 							}
 						}
 					},
-					get: function(name, value)
+					get: function(name)
 					{
 						return (_data[name] || {}).value;
 					},
@@ -919,7 +931,7 @@ const Crystalline = (function()
 
 			function API_get(name)
 			{
-				return dataStorage.get(name);
+				return copy(dataStorage.get(name));
 			}
 
 			function API_bind(elementOrSelector, name)

@@ -24,6 +24,18 @@ return function () {
 			return obj === null || obj === undefined ? obj : Object.getPrototypeOf(obj);
 		};
 
+		var copy = function copy(val) {
+			var result = void 0;
+			if (val === null || val === undefined) {
+				result = val;
+			} else if ((typeof val === "undefined" ? "undefined" : _typeof(val)) === "object") {
+				result = Object.assign(Object.create(getProto(val)), val);
+			} else if (typeof val === "function") {
+				result = val.bind(this);
+			}
+			return result;
+		};
+
 		var getArrayType = function getArrayType(arr) {
 			if (Array.isArray(arr)) {
 				var type = getProto(arr[0]);
@@ -204,7 +216,7 @@ return function () {
 							}
 						}
 					},
-					get: function get(name, value) {
+					get: function get(name) {
 						return (_data[name] || {}).value;
 					},
 					clearAll: function clearAll() {
@@ -1074,7 +1086,7 @@ return function () {
 			}
 
 			function API_get(name) {
-				return dataStorage.get(name);
+				return copy(dataStorage.get(name));
 			}
 
 			function API_bind(elementOrSelector, name) {

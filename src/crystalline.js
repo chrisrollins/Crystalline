@@ -931,7 +931,7 @@ const Crystalline = (function()
 
 			function API_get(name)
 			{
-				return copy(dataStorage.get(name));
+				return dataStorage.get(name);
 			}
 
 			function API_bind(elementOrSelector, name)

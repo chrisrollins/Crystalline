@@ -197,7 +197,7 @@ return function () {
 								}
 							}
 						}
-						if ((typeof value === "undefined" ? "undefined" : _typeof(value)) === "object") {
+						if (value && (typeof value === "undefined" ? "undefined" : _typeof(value)) === "object") {
 							var _arr = ["set", "get", "order", "format"];
 
 							var _loop3 = function _loop3() {

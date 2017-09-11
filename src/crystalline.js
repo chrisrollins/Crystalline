@@ -146,7 +146,7 @@ const Crystalline = (function()
 								}
 							}
 						}
-						if(typeof value === "object")
+						if(value && typeof value === "object")
 						{
 							for(let func of ["set", "get", "order", "format"])
 							{

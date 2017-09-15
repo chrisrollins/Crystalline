@@ -568,7 +568,7 @@ if (!window.Crystalline) {
 								updateDispatch(promiseDestination, result, name);
 							}).catch(function (err) {
 								promiseDestination.innerText = "";
-								updateDispatch(promiseDestination, generateElement("span", { innerText: "Error loading data." }));
+								updateDispatch(promiseDestination, document.createTextNode("Error loading data."));
 							});
 						} else if ((typeof data === "undefined" ? "undefined" : _typeof(data)) === "object") {
 							var table = generateElement("table");

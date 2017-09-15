@@ -397,7 +397,7 @@ if(!window.Crystalline)
 							debugMsg(`The data bound to <${element.nodeName.toLowerCase()}> tag with id '${element.id}' is undefined.`);
 							return;
 						}
-						else if(isHTMLElement(data))
+						else if(isHTMLElement(data) || data instanceof Text)
 						{
 							element.appendChild(data);
 						}
@@ -413,7 +413,7 @@ if(!window.Crystalline)
 							.catch(function(err)
 							{
 								promiseDestination.innerText = "";
-								updateDispatch(promiseDestination, generateElement("span", {innerText: "Error loading data."}));
+								updateDispatch(promiseDestination, document.createTextNode("Error loading data."));
 							});
 						}
 						else if(typeof data === "object")
@@ -430,7 +430,7 @@ if(!window.Crystalline)
 							}
 							else
 							{
-								updateDispatch(element, generateElement("span", {innerText: data}));
+								updateDispatch(element, document.createTextNode(data));
 							}
 						}
 

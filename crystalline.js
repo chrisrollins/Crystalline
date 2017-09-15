@@ -558,7 +558,7 @@ if (!window.Crystalline) {
 						if (data === undefined || data === null) {
 							debugMsg("The data bound to <" + element.nodeName.toLowerCase() + "> tag with id '" + element.id + "' is undefined.");
 							return;
-						} else if (isHTMLElement(data)) {
+						} else if (isHTMLElement(data) || data instanceof Text) {
 							element.appendChild(data);
 						} else if (isPromise(data)) {
 							var promiseDestination = generateElement("div", { innerText: "Loading...", style: { display: "inline-block" } });
@@ -578,7 +578,7 @@ if (!window.Crystalline) {
 							if (isTagOutBindable(element.nodeName)) {
 								element.value = data;
 							} else {
-								updateDispatch(element, generateElement("span", { innerText: data }));
+								updateDispatch(element, document.createTextNode(data));
 							}
 						}
 					}

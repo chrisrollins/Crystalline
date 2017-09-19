@@ -3,13 +3,11 @@
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
-
 if (!window.Crystalline) {
+	var libName = "Crystalline";
 	var Crystalline = function () {
 		try {
 			"use strict";
-			var _libName = "Crystalline";
 			var nameBindings = {};
 			var keysInitialized = {};
 			var globalFlags = {
@@ -20,6 +18,45 @@ if (!window.Crystalline) {
 			var API = {
 				data: {}
 			};
+
+			var libMsg = function libMsg(consoleMethod, msgPrefix, conditionsFunc, msg) {
+				if (!conditionsFunc || conditionsFunc()) {
+					if (!Array.isArray(msg)) {
+						msg = [msg];
+					}
+
+					var _iteratorNormalCompletion = true;
+					var _didIteratorError = false;
+					var _iteratorError = undefined;
+
+					try {
+						for (var _iterator = msg[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+							var m = _step.value;
+
+							consoleMethod("" + msgPrefix + m);
+						}
+					} catch (err) {
+						_didIteratorError = true;
+						_iteratorError = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion && _iterator.return) {
+								_iterator.return();
+							}
+						} finally {
+							if (_didIteratorError) {
+								throw _iteratorError;
+							}
+						}
+					}
+				}
+			};
+
+			var debugMsg = libMsg.bind(null, console.warn, libName + " - DEBUG: ", function () {
+				return globalFlags.debugMode;
+			});
+			var warning = libMsg.bind(null, console.warn, libName + ": ", undefined);
+			var error = libMsg.bind(null, console.error, libName + ": ", undefined);
 
 			var getProto = function getProto(obj) {
 				return obj === null || obj === undefined ? obj : Object.getPrototypeOf(obj);
@@ -40,29 +77,29 @@ if (!window.Crystalline) {
 			var getArrayType = function getArrayType(arr) {
 				if (Array.isArray(arr)) {
 					var type = getProto(arr[0]);
-					var _iteratorNormalCompletion = true;
-					var _didIteratorError = false;
-					var _iteratorError = undefined;
+					var _iteratorNormalCompletion2 = true;
+					var _didIteratorError2 = false;
+					var _iteratorError2 = undefined;
 
 					try {
-						for (var _iterator = arr[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-							var item = _step.value;
+						for (var _iterator2 = arr[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+							var item = _step2.value;
 
 							if (getProto(item) !== type) {
 								return undefined;
 							}
 						}
 					} catch (err) {
-						_didIteratorError = true;
-						_iteratorError = err;
+						_didIteratorError2 = true;
+						_iteratorError2 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion && _iterator.return) {
-								_iterator.return();
+							if (!_iteratorNormalCompletion2 && _iterator2.return) {
+								_iterator2.return();
 							}
 						} finally {
-							if (_didIteratorError) {
-								throw _iteratorError;
+							if (_didIteratorError2) {
+								throw _iteratorError2;
 							}
 						}
 					}
@@ -97,13 +134,13 @@ if (!window.Crystalline) {
 							return storedVal;
 						},
 						set: function set(newVal) {
-							var _iteratorNormalCompletion2 = true;
-							var _didIteratorError2 = false;
-							var _iteratorError2 = undefined;
+							var _iteratorNormalCompletion3 = true;
+							var _didIteratorError3 = false;
+							var _iteratorError3 = undefined;
 
 							try {
-								for (var _iterator2 = config[_key][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-									var allowed = _step2.value;
+								for (var _iterator3 = config[_key][Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+									var allowed = _step3.value;
 
 									if (newVal === allowed) {
 										storedVal = newVal;
@@ -111,16 +148,16 @@ if (!window.Crystalline) {
 									}
 								}
 							} catch (err) {
-								_didIteratorError2 = true;
-								_iteratorError2 = err;
+								_didIteratorError3 = true;
+								_iteratorError3 = err;
 							} finally {
 								try {
-									if (!_iteratorNormalCompletion2 && _iterator2.return) {
-										_iterator2.return();
+									if (!_iteratorNormalCompletion3 && _iterator3.return) {
+										_iterator3.return();
 									}
 								} finally {
-									if (_didIteratorError2) {
-										throw _iteratorError2;
+									if (_didIteratorError3) {
+										throw _iteratorError3;
 									}
 								}
 							}
@@ -137,19 +174,51 @@ if (!window.Crystalline) {
 				}
 			};
 
+			var localData = function () {
+				var returnObj = {};
+				var memo = {};
+				var _arr = ["localStorage", "sessionStorage"];
+
+				var _loop2 = function _loop2() {
+					var key = _arr[_i];
+					Object.defineProperty(returnObj, key, {
+						get: function get() {
+							if (!memo[key]) {
+								try {
+									memo[key] = window[key];
+								} catch (e) {}
+
+								if (!memo[key]) {
+									error("Error while trying to access " + key + ". Data stored in " + libName + " will not be persistent. Check your browser settings.");
+									memo[key] = {};
+								}
+							}
+							return memo[key];
+						},
+						enumerable: true,
+						configurable: true
+					});
+				};
+
+				for (var _i = 0; _i < _arr.length; _i++) {
+					_loop2();
+				}
+				return Object.freeze(returnObj);
+			}();
+
 			return function () {
 				var dataStorage = function () {
-					if (!localStorage._CrSession) {
-						localStorage._CrSession = "{}";
+					if (!localData.localStorage._CrSession) {
+						localData.localStorage._CrSession = "{}";
 					}
-					var _data = JSON.parse(localStorage._CrSession);
+					var _data = JSON.parse(localData.localStorage._CrSession);
 
 					var sessionCounter = {
 						get count() {
-							return parseInt(localStorage._crSessionCounter) || 0;
+							return parseInt(localData.localStorage._crSessionCounter) || 0;
 						},
 						set count(value) {
-							localStorage._crSessionCounter = value;
+							localData.localStorage._crSessionCounter = value;
 						}
 					};
 
@@ -157,16 +226,16 @@ if (!window.Crystalline) {
 						set: function set(name, value) {
 							_data[name] = _data[name] || Object.create(null);
 							_data[name].value = value;
-							localStorage._CrSession = JSON.stringify(_data);
+							localData.localStorage._CrSession = JSON.stringify(_data);
 							if (Array.isArray(value)) {
 								var keys = Object.getOwnPropertyNames(Array.prototype);
-								var _iteratorNormalCompletion3 = true;
-								var _didIteratorError3 = false;
-								var _iteratorError3 = undefined;
+								var _iteratorNormalCompletion4 = true;
+								var _didIteratorError4 = false;
+								var _iteratorError4 = undefined;
 
 								try {
-									var _loop2 = function _loop2() {
-										var key = _step3.value;
+									var _loop3 = function _loop3() {
+										var key = _step4.value;
 
 										if (typeof Array.prototype[key] === "function") {
 											value[key] = function () {
@@ -180,29 +249,29 @@ if (!window.Crystalline) {
 										}
 									};
 
-									for (var _iterator3 = keys[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-										_loop2();
+									for (var _iterator4 = keys[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+										_loop3();
 									}
 								} catch (err) {
-									_didIteratorError3 = true;
-									_iteratorError3 = err;
+									_didIteratorError4 = true;
+									_iteratorError4 = err;
 								} finally {
 									try {
-										if (!_iteratorNormalCompletion3 && _iterator3.return) {
-											_iterator3.return();
+										if (!_iteratorNormalCompletion4 && _iterator4.return) {
+											_iterator4.return();
 										}
 									} finally {
-										if (_didIteratorError3) {
-											throw _iteratorError3;
+										if (_didIteratorError4) {
+											throw _iteratorError4;
 										}
 									}
 								}
 							}
 							if (value && (typeof value === "undefined" ? "undefined" : _typeof(value)) === "object") {
-								var _arr = ["set", "get", "order", "format"];
+								var _arr2 = ["set", "get", "order", "format"];
 
-								var _loop3 = function _loop3() {
-									var func = _arr[_i];
+								var _loop4 = function _loop4() {
+									var func = _arr2[_i2];
 									value[func] = function () {
 										for (var _len2 = arguments.length, args = Array(_len2), _key3 = 0; _key3 < _len2; _key3++) {
 											args[_key3] = arguments[_key3];
@@ -212,8 +281,8 @@ if (!window.Crystalline) {
 									};
 								};
 
-								for (var _i = 0; _i < _arr.length; _i++) {
-									_loop3();
+								for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
+									_loop4();
 								}
 							}
 						},
@@ -221,7 +290,7 @@ if (!window.Crystalline) {
 							return (_data[name] || {}).value;
 						},
 						clearAll: function clearAll() {
-							localStorage._CrSession = "{}";
+							localData.localStorage._CrSession = "{}";
 							for (var prop in _data) {
 								delete _data[prop];
 							}
@@ -255,154 +324,63 @@ if (!window.Crystalline) {
 					});
 				}();
 
-				var debugMsg = function debugMsg(msg) {
-					if (globalFlags.debugMode) {
-						if (!Array.isArray(msg)) {
-							msg = [msg];
-						}
-						var _iteratorNormalCompletion4 = true;
-						var _didIteratorError4 = false;
-						var _iteratorError4 = undefined;
-
-						try {
-							for (var _iterator4 = msg[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-								var m = _step4.value;
-
-								console.warn(_libName + " - DEBUG: " + m);
-							}
-						} catch (err) {
-							_didIteratorError4 = true;
-							_iteratorError4 = err;
-						} finally {
-							try {
-								if (!_iteratorNormalCompletion4 && _iterator4.return) {
-									_iterator4.return();
-								}
-							} finally {
-								if (_didIteratorError4) {
-									throw _iteratorError4;
-								}
-							}
-						}
-					}
-				};
-
-				var warning = function warning(msg) {
-					if (!Array.isArray(msg)) {
-						msg = [msg];
-					}
-
-					var _iteratorNormalCompletion5 = true;
-					var _didIteratorError5 = false;
-					var _iteratorError5 = undefined;
-
-					try {
-						for (var _iterator5 = msg[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-							var m = _step5.value;
-
-							console.warn(_libName + ": " + m);
-						}
-					} catch (err) {
-						_didIteratorError5 = true;
-						_iteratorError5 = err;
-					} finally {
-						try {
-							if (!_iteratorNormalCompletion5 && _iterator5.return) {
-								_iterator5.return();
-							}
-						} finally {
-							if (_didIteratorError5) {
-								throw _iteratorError5;
-							}
-						}
-					}
-				};
-
-				var error = function error(msg) {
-					if (!Array.isArray(msg)) {
-						msg = [msg];
-					}
-
-					var _iteratorNormalCompletion6 = true;
-					var _didIteratorError6 = false;
-					var _iteratorError6 = undefined;
-
-					try {
-						for (var _iterator6 = msg[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-							var m = _step6.value;
-
-							console.error(_libName + ": " + m);
-						}
-					} catch (err) {
-						_didIteratorError6 = true;
-						_iteratorError6 = err;
-					} finally {
-						try {
-							if (!_iteratorNormalCompletion6 && _iterator6.return) {
-								_iterator6.return();
-							}
-						} finally {
-							if (_didIteratorError6) {
-								throw _iteratorError6;
-							}
-						}
-					}
-				};
-
 				for (var name in dataStorage.all) {
 					if (!keysInitialized[name]) {
 						API_init(name, dataStorage.get(name));
 					}
 				}
 
-				var _arr2 = ["onabort", "onafterprint", "onanimationcancel", "onanimationend", "onanimationiteration", "onappinstalled", "onauxclick", "onbeforeinstallprompt", "onbeforeprint", "onbeforeunload", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "ondevicelight", "ondevicemotion", "ondeviceorientation", "ondeviceorientationabsolute", "ondeviceproximity", "ondragdrop", "onerror", "onfocus", "ongotpointercapture", "onhashchange", "oninput", "onkeydown", "onkeypress", "onkeyup", "onlanguagechange", "onload", "onloadend", "onloadstart", "onlostpointercapture", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onmozbeforepaint", "onpaint", "onpointercancel", "onpointerdown", "onpointerenter", "onpointerleave", "onpointermove", "onpointerout", "onpointerover", "onpointerup", "onpopstate", "onrejectionhandled", "onreset", "onresize", "onscroll", "onselect", "onselectionchange", "onselectstart", "onstorage", "onsubmit", "ontouchcancel", "ontouchmove", "ontouchstart", "ontransitioncancel", "ontransitionend", "onunhandledrejection", "onunload", "onuserproximity", "onvrdisplayconnected", "onvrdisplaydisconnected", "onvrdisplaypresentchange"];
+				var _arr3 = ["onabort", "onafterprint", "onanimationcancel", "onanimationend", "onanimationiteration", "onappinstalled", "onauxclick", "onbeforeinstallprompt", "onbeforeprint", "onbeforeunload", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "ondevicelight", "ondevicemotion", "ondeviceorientation", "ondeviceorientationabsolute", "ondeviceproximity", "ondragdrop", "onerror", "onfocus", "ongotpointercapture", "onhashchange", "oninput", "onkeydown", "onkeypress", "onkeyup", "onlanguagechange", "onload", "onloadend", "onloadstart", "onlostpointercapture", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onmozbeforepaint", "onpaint", "onpointercancel", "onpointerdown", "onpointerenter", "onpointerleave", "onpointermove", "onpointerout", "onpointerover", "onpointerup", "onpopstate", "onrejectionhandled", "onreset", "onresize", "onscroll", "onselect", "onselectionchange", "onselectstart", "onstorage", "onsubmit", "ontouchcancel", "ontouchmove", "ontouchstart", "ontransitioncancel", "ontransitionend", "onunhandledrejection", "onunload", "onuserproximity", "onvrdisplayconnected", "onvrdisplaydisconnected", "onvrdisplaypresentchange"];
 
-				var _loop5 = function _loop5() {
-					var event = _arr2[_i2];
+				var _loop6 = function _loop6() {
+					var event = _arr3[_i3];
 					var funcs = [];
 
 					if (window[event] !== undefined && window[event] !== null) {
 						if (typeof window[event] === "function") {
 							funcs.push(window[event]);
-							warning("There was already a function in window." + event + ". It has been included in the " + _libName + " event dispatcher's function list. It will still be called when window." + event + " triggers.");
+							warning("There was already a function in window." + event + ". It has been included in the " + libName + " event dispatcher's function list. It will still be called when window." + event + " triggers.");
 						} else {
-							warning("There was an event conflict with window." + event + ". There was a non-function value in the event. It has been overwritten by the " + _libName + " event dispatcher.");
+							warning("There was an event conflict with window." + event + ". There was a non-function value in the event. It has been overwritten by the " + libName + " event dispatcher.");
 						}
 					}
 
 					window[event] = function (e) {
 						var result = void 0;
-						var _iteratorNormalCompletion17 = true;
-						var _didIteratorError17 = false;
-						var _iteratorError17 = undefined;
+
+						var _iteratorNormalCompletion15 = true;
+						var _didIteratorError15 = false;
+						var _iteratorError15 = undefined;
 
 						try {
-							for (var _iterator17 = funcs[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
-								var f = _step17.value;
+							for (var _iterator15 = funcs[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+								var f = _step15.value;
 
-								var fres = f(e);
-								if (fres !== undefined) {
-									result = fres;
+								try {
+									var fres = f(e);
+									if (fres !== undefined) {
+										result = fres;
+									}
+								} catch (e) {
+									console.log(e);
 								}
 							}
 						} catch (err) {
-							_didIteratorError17 = true;
-							_iteratorError17 = err;
+							_didIteratorError15 = true;
+							_iteratorError15 = err;
 						} finally {
 							try {
-								if (!_iteratorNormalCompletion17 && _iterator17.return) {
-									_iterator17.return();
+								if (!_iteratorNormalCompletion15 && _iterator15.return) {
+									_iterator15.return();
 								}
 							} finally {
-								if (_didIteratorError17) {
-									throw _iteratorError17;
+								if (_didIteratorError15) {
+									throw _iteratorError15;
 								}
 							}
 						}
 
-						if (result !== undefined) {
-							return result;
-						}
+						return result;
 					};
 
 					Object.defineProperty(window, event, {
@@ -411,13 +389,13 @@ if (!window.Crystalline) {
 								f[_key12] = arguments[_key12];
 							}
 
-							var _iteratorNormalCompletion18 = true;
-							var _didIteratorError18 = false;
-							var _iteratorError18 = undefined;
+							var _iteratorNormalCompletion16 = true;
+							var _didIteratorError16 = false;
+							var _iteratorError16 = undefined;
 
 							try {
-								for (var _iterator18 = f[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
-									var _func = _step18.value;
+								for (var _iterator16 = f[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+									var _func = _step16.value;
 
 									if (typeof _func === "function") {
 										funcs.push(_func);
@@ -426,16 +404,16 @@ if (!window.Crystalline) {
 									}
 								}
 							} catch (err) {
-								_didIteratorError18 = true;
-								_iteratorError18 = err;
+								_didIteratorError16 = true;
+								_iteratorError16 = err;
 							} finally {
 								try {
-									if (!_iteratorNormalCompletion18 && _iterator18.return) {
-										_iterator18.return();
+									if (!_iteratorNormalCompletion16 && _iterator16.return) {
+										_iterator16.return();
 									}
 								} finally {
-									if (_didIteratorError18) {
-										throw _iteratorError18;
+									if (_didIteratorError16) {
+										throw _iteratorError16;
 									}
 								}
 							}
@@ -443,13 +421,13 @@ if (!window.Crystalline) {
 					});
 				};
 
-				for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-					_loop5();
+				for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
+					_loop6();
 				}
 
-				if (dataStorage.incrementSessionCounter().before === 0 && sessionStorage._CrThisSession !== "active") {
+				if (dataStorage.incrementSessionCounter().before === 0 && localData.sessionStorage._CrThisSession !== "active") {
 					dataStorage.clearAll();
-					sessionStorage._CrThisSession = "active";
+					localData.sessionStorage._CrThisSession = "active";
 				}
 
 				window.onload = function () {
@@ -469,32 +447,30 @@ if (!window.Crystalline) {
 
 				function clearElement(element) {
 					if (!element.CrCleared) {
-						var _element$childNodes = _toArray(element.childNodes),
-						    children = _element$childNodes.slice(0);
-
-						var _iteratorNormalCompletion7 = true;
-						var _didIteratorError7 = false;
-						var _iteratorError7 = undefined;
+						var children = Array.from(element.children);
+						var _iteratorNormalCompletion5 = true;
+						var _didIteratorError5 = false;
+						var _iteratorError5 = undefined;
 
 						try {
-							for (var _iterator7 = children[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-								var child = _step7.value;
+							for (var _iterator5 = children[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+								var child = _step5.value;
 
 								if (child.CrID !== undefined) {
 									child.remove();
 								}
 							}
 						} catch (err) {
-							_didIteratorError7 = true;
-							_iteratorError7 = err;
+							_didIteratorError5 = true;
+							_iteratorError5 = err;
 						} finally {
 							try {
-								if (!_iteratorNormalCompletion7 && _iterator7.return) {
-									_iterator7.return();
+								if (!_iteratorNormalCompletion5 && _iterator5.return) {
+									_iterator5.return();
 								}
 							} finally {
-								if (_didIteratorError7) {
-									throw _iteratorError7;
+								if (_didIteratorError5) {
+									throw _iteratorError5;
 								}
 							}
 						}
@@ -508,27 +484,27 @@ if (!window.Crystalline) {
 				}
 
 				function refreshName(name) {
-					var _iteratorNormalCompletion8 = true;
-					var _didIteratorError8 = false;
-					var _iteratorError8 = undefined;
+					var _iteratorNormalCompletion6 = true;
+					var _didIteratorError6 = false;
+					var _iteratorError6 = undefined;
 
 					try {
-						for (var _iterator8 = (nameBindings[name] || [])[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-							var element = _step8.value;
+						for (var _iterator6 = (nameBindings[name] || [])[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+							var element = _step6.value;
 
 							updateDispatch(element, dataStorage.get(name), element.CrNameBind);
 						}
 					} catch (err) {
-						_didIteratorError8 = true;
-						_iteratorError8 = err;
+						_didIteratorError6 = true;
+						_iteratorError6 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion8 && _iterator8.return) {
-								_iterator8.return();
+							if (!_iteratorNormalCompletion6 && _iterator6.return) {
+								_iterator6.return();
 							}
 						} finally {
-							if (_didIteratorError8) {
-								throw _iteratorError8;
+							if (_didIteratorError6) {
+								throw _iteratorError6;
 							}
 						}
 					}
@@ -586,13 +562,13 @@ if (!window.Crystalline) {
 					function lists() {
 						if (Array.isArray(data)) {
 							var fragment = document.createDocumentFragment();
-							var _iteratorNormalCompletion9 = true;
-							var _didIteratorError9 = false;
-							var _iteratorError9 = undefined;
+							var _iteratorNormalCompletion7 = true;
+							var _didIteratorError7 = false;
+							var _iteratorError7 = undefined;
 
 							try {
-								for (var _iterator9 = data[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-									var item = _step9.value;
+								for (var _iterator7 = data[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+									var item = _step7.value;
 
 									var li = generateElement("li");
 									if ((typeof item === "undefined" ? "undefined" : _typeof(item)) === "object") {
@@ -603,16 +579,16 @@ if (!window.Crystalline) {
 									fragment.appendChild(li);
 								}
 							} catch (err) {
-								_didIteratorError9 = true;
-								_iteratorError9 = err;
+								_didIteratorError7 = true;
+								_iteratorError7 = err;
 							} finally {
 								try {
-									if (!_iteratorNormalCompletion9 && _iterator9.return) {
-										_iterator9.return();
+									if (!_iteratorNormalCompletion7 && _iterator7.return) {
+										_iterator7.return();
 									}
 								} finally {
-									if (_didIteratorError9) {
-										throw _iteratorError9;
+									if (_didIteratorError7) {
+										throw _iteratorError7;
 									}
 								}
 							}
@@ -631,13 +607,14 @@ if (!window.Crystalline) {
 							var theadFrag = document.createDocumentFragment();
 							var tbodyFrag = document.createDocumentFragment();
 							if (element.nodeName === "TABLE") {
-								var _iteratorNormalCompletion10 = true;
-								var _didIteratorError10 = false;
-								var _iteratorError10 = undefined;
+								var children = Array.from(element.children);
+								var _iteratorNormalCompletion8 = true;
+								var _didIteratorError8 = false;
+								var _iteratorError8 = undefined;
 
 								try {
-									for (var _iterator10 = element.childNodes[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-										var child = _step10.value;
+									for (var _iterator8 = children[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+										var child = _step8.value;
 
 										if (child.nodeName === "THEAD") {
 											thead = child;
@@ -646,16 +623,16 @@ if (!window.Crystalline) {
 										}
 									}
 								} catch (err) {
-									_didIteratorError10 = true;
-									_iteratorError10 = err;
+									_didIteratorError8 = true;
+									_iteratorError8 = err;
 								} finally {
 									try {
-										if (!_iteratorNormalCompletion10 && _iterator10.return) {
-											_iterator10.return();
+										if (!_iteratorNormalCompletion8 && _iterator8.return) {
+											_iterator8.return();
 										}
 									} finally {
-										if (_didIteratorError10) {
-											throw _iteratorError10;
+										if (_didIteratorError8) {
+											throw _iteratorError8;
 										}
 									}
 								}
@@ -663,13 +640,13 @@ if (!window.Crystalline) {
 
 							if (Array.isArray(data)) {
 								var colNames = new Set(dataStorage.getOrder(name));
-								var _iteratorNormalCompletion11 = true;
-								var _didIteratorError11 = false;
-								var _iteratorError11 = undefined;
+								var _iteratorNormalCompletion9 = true;
+								var _didIteratorError9 = false;
+								var _iteratorError9 = undefined;
 
 								try {
-									for (var _iterator11 = data[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-										var _item = _step11.value;
+									for (var _iterator9 = data[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+										var _item = _step9.value;
 
 										if ((typeof _item === "undefined" ? "undefined" : _typeof(_item)) === "object" && !Array.isArray(_item)) {
 											for (var _key5 in _item) {
@@ -680,16 +657,16 @@ if (!window.Crystalline) {
 										}
 									}
 								} catch (err) {
-									_didIteratorError11 = true;
-									_iteratorError11 = err;
+									_didIteratorError9 = true;
+									_iteratorError9 = err;
 								} finally {
 									try {
-										if (!_iteratorNormalCompletion11 && _iterator11.return) {
-											_iterator11.return();
+										if (!_iteratorNormalCompletion9 && _iterator9.return) {
+											_iterator9.return();
 										}
 									} finally {
-										if (_didIteratorError11) {
-											throw _iteratorError11;
+										if (_didIteratorError9) {
+											throw _iteratorError9;
 										}
 									}
 								}
@@ -698,13 +675,13 @@ if (!window.Crystalline) {
 
 								if (colNames.size > 0) {
 									var tr = generateElement("tr");
-									var _iteratorNormalCompletion12 = true;
-									var _didIteratorError12 = false;
-									var _iteratorError12 = undefined;
+									var _iteratorNormalCompletion10 = true;
+									var _didIteratorError10 = false;
+									var _iteratorError10 = undefined;
 
 									try {
-										for (var _iterator12 = colNameArr[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-											var colName = _step12.value;
+										for (var _iterator10 = colNameArr[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+											var colName = _step10.value;
 
 											if ((format[colName] || Object.create(null)).showTitle !== false) {
 												var th = generateElement("th");
@@ -713,16 +690,16 @@ if (!window.Crystalline) {
 											}
 										}
 									} catch (err) {
-										_didIteratorError12 = true;
-										_iteratorError12 = err;
+										_didIteratorError10 = true;
+										_iteratorError10 = err;
 									} finally {
 										try {
-											if (!_iteratorNormalCompletion12 && _iterator12.return) {
-												_iterator12.return();
+											if (!_iteratorNormalCompletion10 && _iterator10.return) {
+												_iterator10.return();
 											}
 										} finally {
-											if (_didIteratorError12) {
-												throw _iteratorError12;
+											if (_didIteratorError10) {
+												throw _iteratorError10;
 											}
 										}
 									}
@@ -736,13 +713,13 @@ if (!window.Crystalline) {
 									var attachRow = true;
 									if ((typeof arr === "undefined" ? "undefined" : _typeof(arr)) === "object" && !Array.isArray(arr) && arr !== null) {
 										var atLeastOneColumn = false;
-										var _iteratorNormalCompletion13 = true;
-										var _didIteratorError13 = false;
-										var _iteratorError13 = undefined;
+										var _iteratorNormalCompletion11 = true;
+										var _didIteratorError11 = false;
+										var _iteratorError11 = undefined;
 
 										try {
-											for (var _iterator13 = colNameArr[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-												var _colName = _step13.value;
+											for (var _iterator11 = colNameArr[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+												var _colName = _step11.value;
 
 												var td = generateElement("td");
 												if (arr[_colName] !== "" && arr[_colName] !== undefined) {
@@ -767,16 +744,16 @@ if (!window.Crystalline) {
 												_tr.appendChild(td);
 											}
 										} catch (err) {
-											_didIteratorError13 = true;
-											_iteratorError13 = err;
+											_didIteratorError11 = true;
+											_iteratorError11 = err;
 										} finally {
 											try {
-												if (!_iteratorNormalCompletion13 && _iterator13.return) {
-													_iterator13.return();
+												if (!_iteratorNormalCompletion11 && _iterator11.return) {
+													_iterator11.return();
 												}
 											} finally {
-												if (_didIteratorError13) {
-													throw _iteratorError13;
+												if (_didIteratorError11) {
+													throw _iteratorError11;
 												}
 											}
 										}
@@ -784,29 +761,29 @@ if (!window.Crystalline) {
 										attachRow = atLeastOneColumn;
 									} else if (arr !== undefined && arr !== null) {
 										var inner = Array.isArray(arr) ? arr : [arr];
-										var _iteratorNormalCompletion14 = true;
-										var _didIteratorError14 = false;
-										var _iteratorError14 = undefined;
+										var _iteratorNormalCompletion12 = true;
+										var _didIteratorError12 = false;
+										var _iteratorError12 = undefined;
 
 										try {
-											for (var _iterator14 = inner[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-												var item = _step14.value;
+											for (var _iterator12 = inner[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+												var item = _step12.value;
 
 												var _td = generateElement("td");
 												updateDispatch(_td, item, name);
 												_tr.appendChild(_td);
 											}
 										} catch (err) {
-											_didIteratorError14 = true;
-											_iteratorError14 = err;
+											_didIteratorError12 = true;
+											_iteratorError12 = err;
 										} finally {
 											try {
-												if (!_iteratorNormalCompletion14 && _iterator14.return) {
-													_iterator14.return();
+												if (!_iteratorNormalCompletion12 && _iterator12.return) {
+													_iterator12.return();
 												}
 											} finally {
-												if (_didIteratorError14) {
-													throw _iteratorError14;
+												if (_didIteratorError12) {
+													throw _iteratorError12;
 												}
 											}
 										}
@@ -905,9 +882,9 @@ if (!window.Crystalline) {
 						var thisRef = this;
 						var fetchOptions = {};
 						var optionsSource = (typeof options === "undefined" ? "undefined" : _typeof(options)) === "object" ? Object.assign(generateOptions(), options) : thisRef.options;
-						var _arr3 = ["mode", "headers", "credentials", "cache", "redirect", "referrer", "integrity"];
-						for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
-							var _key6 = _arr3[_i3];
+						var _arr4 = ["mode", "headers", "credentials", "cache", "redirect", "referrer", "integrity"];
+						for (var _i4 = 0; _i4 < _arr4.length; _i4++) {
+							var _key6 = _arr4[_i4];
 							fetchOptions[_key6] = optionsSource[_key6];
 						}
 
@@ -949,10 +926,10 @@ if (!window.Crystalline) {
 					});
 
 					var applyMethods = function applyMethods(obj) {
-						var _arr4 = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+						var _arr5 = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 
-						for (var _i4 = 0; _i4 < _arr4.length; _i4++) {
-							var method = _arr4[_i4];
+						for (var _i5 = 0; _i5 < _arr5.length; _i5++) {
+							var method = _arr5[_i5];
 							obj[method.toLowerCase()] = httpSend.bind(obj, method);
 						}
 						obj.request = httpSend.bind(obj);
@@ -1100,32 +1077,44 @@ if (!window.Crystalline) {
 						out: Object.freeze(outBind.bind(undefined, elementOrSelector))
 					});
 
+					var elArrHelper = function elArrHelper(elems) {
+						if (typeof elems === "string") {
+							return Array.from(document.querySelectorAll(elems));
+						} else if (elems instanceof NodeList) {
+							return Array.from(elems);
+						} else if (elems instanceof Array) {
+							return elems;
+						} else {
+							return [elems];
+						}
+					};
+
 					function inBind(_elements, dataName) {
 						delayUntilLoad(function () {
-							var elements = typeof _elements === "string" ? document.querySelectorAll(_elements) : _elements instanceof Array || _elements instanceof NodeList ? _elements : [_elements];
-							var _iteratorNormalCompletion15 = true;
-							var _didIteratorError15 = false;
-							var _iteratorError15 = undefined;
+							var elements = elArrHelper(_elements);
+							var _iteratorNormalCompletion13 = true;
+							var _didIteratorError13 = false;
+							var _iteratorError13 = undefined;
 
 							try {
-								for (var _iterator15 = elements[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
-									var el = _step15.value;
+								for (var _iterator13 = elements[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+									var el = _step13.value;
 
 									(nameBindings[dataName] || (nameBindings[dataName] = [])).push(el);
 									el.CrNameBind = dataName;
 									refreshElement(el);
 								}
 							} catch (err) {
-								_didIteratorError15 = true;
-								_iteratorError15 = err;
+								_didIteratorError13 = true;
+								_iteratorError13 = err;
 							} finally {
 								try {
-									if (!_iteratorNormalCompletion15 && _iterator15.return) {
-										_iterator15.return();
+									if (!_iteratorNormalCompletion13 && _iterator13.return) {
+										_iterator13.return();
 									}
 								} finally {
-									if (_didIteratorError15) {
-										throw _iteratorError15;
+									if (_didIteratorError13) {
+										throw _iteratorError13;
 									}
 								}
 							}
@@ -1135,14 +1124,14 @@ if (!window.Crystalline) {
 
 					function outBind(_elements, dataName) {
 						delayUntilLoad(function () {
-							var elements = typeof _elements === "string" ? document.querySelectorAll(_elements) : _elements instanceof Array || _elements instanceof NodeList ? _elements : [_elements];
-							var _iteratorNormalCompletion16 = true;
-							var _didIteratorError16 = false;
-							var _iteratorError16 = undefined;
+							var elements = elArrHelper(_elements);
+							var _iteratorNormalCompletion14 = true;
+							var _didIteratorError14 = false;
+							var _iteratorError14 = undefined;
 
 							try {
-								var _loop4 = function _loop4() {
-									var el = _step16.value;
+								var _loop5 = function _loop5() {
+									var el = _step14.value;
 
 									if (isTagOutBindable(el.nodeName)) {
 										el.oninput = function () {
@@ -1151,20 +1140,20 @@ if (!window.Crystalline) {
 									}
 								};
 
-								for (var _iterator16 = elements[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
-									_loop4();
+								for (var _iterator14 = elements[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+									_loop5();
 								}
 							} catch (err) {
-								_didIteratorError16 = true;
-								_iteratorError16 = err;
+								_didIteratorError14 = true;
+								_iteratorError14 = err;
 							} finally {
 								try {
-									if (!_iteratorNormalCompletion16 && _iterator16.return) {
-										_iterator16.return();
+									if (!_iteratorNormalCompletion14 && _iterator14.return) {
+										_iterator14.return();
 									}
 								} finally {
-									if (_didIteratorError16) {
-										throw _iteratorError16;
+									if (_didIteratorError14) {
+										throw _iteratorError14;
 									}
 								}
 							}
@@ -1189,7 +1178,7 @@ if (!window.Crystalline) {
 					debugMode: Object.freeze(API_debugMode)
 				}));
 
-				console.log("%c " + _libName + " initialized successfully.", "color: #116633");
+				console.log("%c " + libName + " initialized successfully.", "color: #116633");
 
 				return lib;
 			}();

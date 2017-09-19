@@ -1,10 +1,10 @@
 if(!window.Crystalline)
 {
+	const libName = "Crystalline";
 	const Crystalline = (function()
 	{
 		try{
 			"use strict";
-			const libName = "Crystalline"
 			const nameBindings = {};
 			const keysInitialized = {};
 			const globalFlags = {
@@ -17,6 +17,26 @@ if(!window.Crystalline)
 			};
 
 			//UTILITY
+
+			const libMsg = function(consoleMethod, msgPrefix, conditionsFunc, msg)
+			{
+				if(!conditionsFunc || conditionsFunc())
+				{
+					if(!Array.isArray(msg))
+					{
+						msg = [msg];
+					}
+
+					for(const m of msg)
+					{
+						consoleMethod(`${msgPrefix}${m}`);
+					}
+				}
+			};
+
+			const debugMsg = libMsg.bind(null, console.warn, `${libName} - DEBUG: `, function(){return globalFlags.debugMode;});
+			const warning = libMsg.bind(null, console.warn, `${libName}: `, undefined);
+			const error = libMsg.bind(null, console.error, `${libName}: `, undefined);
 
 			const getProto = function(obj)
 			{
@@ -102,6 +122,38 @@ if(!window.Crystalline)
 				}
 			};
 
+			const localData = (function()
+			{
+				const returnObj = {};
+				const memo = {};
+				for(let key of ["localStorage", "sessionStorage"])
+				{
+					Object.defineProperty(returnObj, key,
+					{
+						get: function()
+						{
+							if(!memo[key])
+							{
+								try
+									{ memo[key] = window[key]; }
+								catch(e)
+									{ }
+
+								if(!memo[key])
+								{
+									error(`Error while trying to access ${key}. Data stored in ${libName} will not be persistent. Check your browser settings.`);
+									memo[key] = {};
+								}
+							}
+							return memo[key];
+						},
+						enumerable: true,
+						configurable: true
+					});
+				}
+				return Object.freeze(returnObj);
+			})();
+
 			//END UTILITY
 
 			return (function()
@@ -109,20 +161,20 @@ if(!window.Crystalline)
 				//SETUP
 				const dataStorage = function()
 				{
-					if(!localStorage._CrSession)
+					if(!localData.localStorage._CrSession)
 					{
-						localStorage._CrSession = "{}";
+						localData.localStorage._CrSession = "{}";
 					}
-					const _data = JSON.parse(localStorage._CrSession);
+					const _data = JSON.parse(localData.localStorage._CrSession);
 
 					const sessionCounter = {
 						get count()
 						{
-							return (parseInt(localStorage._crSessionCounter) || 0);
+							return (parseInt(localData.localStorage._crSessionCounter) || 0);
 						},
 						set count(value)
 						{
-							localStorage._crSessionCounter = value;
+							localData.localStorage._crSessionCounter = value;
 						}
 					};
 
@@ -132,7 +184,7 @@ if(!window.Crystalline)
 						{
 							_data[name] = (_data[name] || Object.create(null));
 							_data[name].value = value;
-							localStorage._CrSession = JSON.stringify(_data);
+							localData.localStorage._CrSession = JSON.stringify(_data);
 							if(Array.isArray(value))
 							{
 								const keys = Object.getOwnPropertyNames(Array.prototype);
@@ -165,7 +217,7 @@ if(!window.Crystalline)
 						},
 						clearAll: function()
 						{
-							localStorage._CrSession = "{}";
+							localData.localStorage._CrSession = "{}";
 							for (const prop in _data)
 								{ delete _data[prop]; }
 						},
@@ -204,47 +256,6 @@ if(!window.Crystalline)
 					});
 				}();
 
-				const debugMsg = function(msg)
-				{
-					if(globalFlags.debugMode)
-					{
-						if(!Array.isArray(msg))
-						{
-							msg = [msg];
-						}
-						for(const m of msg)
-						{
-							console.warn(`${libName} - DEBUG: ${m}`);
-						}
-					}
-				};
-
-				const warning = function(msg)
-				{
-					if(!Array.isArray(msg))
-					{
-						msg = [msg];
-					}
-
-					for(const m of msg)
-					{
-						console.warn(`${libName}: ${m}`);
-					}
-				};
-
-				const error = function(msg)
-				{
-					if(!Array.isArray(msg))
-					{
-						msg = [msg];
-					}
-
-					for(const m of msg)
-					{
-						console.error(`${libName}: ${m}`);
-					}
-				};
-
 				for(const name in dataStorage.all)
 				{
 					if(!keysInitialized[name])
@@ -273,19 +284,19 @@ if(!window.Crystalline)
 					window[event] = function(e)
 					{
 						let result;
+						
 						for(const f of funcs)
 						{
+							try{
 							const fres = f(e);
 							if(fres !== undefined)
+								{ result = fres; }
+							}catch(e)
 							{
-								result = fres;
+								console.log(e);
 							}
-						}
-
-						if(result !== undefined)
-						{
-							return result;
-						}
+						}						
+						return result;
 					};
 
 					Object.defineProperty(window, event,
@@ -307,10 +318,10 @@ if(!window.Crystalline)
 					});
 				}
 
-				if(dataStorage.incrementSessionCounter().before === 0 && sessionStorage._CrThisSession !== "active")
+				if(dataStorage.incrementSessionCounter().before === 0 && localData.sessionStorage._CrThisSession !== "active")
 				{
 					dataStorage.clearAll();
-					sessionStorage._CrThisSession = "active";
+					localData.sessionStorage._CrThisSession = "active";
 				}
 
 				window.onload = function()
@@ -339,7 +350,7 @@ if(!window.Crystalline)
 				{
 					if(!element.CrCleared)
 					{
-						const [...children] = element.childNodes;
+						const children = Array.from(element.children);
 						for(const child of children)
 						{
 							if(child.CrID !== undefined)
@@ -388,7 +399,6 @@ if(!window.Crystalline)
 						return;
 					}
 					clearElement(element);
-
 
 					function defaultFunc()
 					{
@@ -474,7 +484,8 @@ if(!window.Crystalline)
 							const tbodyFrag = document.createDocumentFragment();
 							if(element.nodeName === "TABLE")
 							{
-								for(const child of element.childNodes)
+								const children = Array.from(element.children);
+								for(const child of children)
 								{
 									if(child.nodeName === "THEAD")
 									{
@@ -946,14 +957,26 @@ if(!window.Crystalline)
 					const funcs = Object.freeze({
 						in: Object.freeze(inBind.bind(undefined, elementOrSelector)),
 						out: Object.freeze(outBind.bind(undefined, elementOrSelector))
-					})
+					});
+
+					const elArrHelper = function(elems)
+					{
+						if(typeof elems === "string")
+							{ return Array.from(document.querySelectorAll(elems)); }
+						else if(elems instanceof NodeList)
+							{ return Array.from(elems); }
+						else if(elems instanceof Array)
+							{ return elems; }
+						else
+							{ return [elems]; }
+					}
 					
 					function inBind(_elements, dataName)
 					{
 						delayUntilLoad(function()
 						{
-							const elements = (typeof _elements === "string") ? document.querySelectorAll(_elements) : (_elements instanceof Array || _elements instanceof NodeList) ? _elements : [_elements];
-							for(let el of elements)
+							const elements = elArrHelper(_elements);
+							for(const el of elements)
 							{
 								( nameBindings[dataName] || (nameBindings[dataName] = []) ).push(el);
 								el.CrNameBind = dataName;
@@ -967,8 +990,8 @@ if(!window.Crystalline)
 					{
 						delayUntilLoad(function()
 						{
-							const elements = (typeof _elements === "string") ? document.querySelectorAll(_elements) : (_elements instanceof Array || _elements instanceof NodeList) ? _elements : [_elements];
-							for(let el of elements)
+							const elements = elArrHelper(_elements);
+							for(const el of elements)
 							{
 								if(isTagOutBindable(el.nodeName))
 								{

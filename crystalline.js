@@ -438,16 +438,23 @@ if (!window.Crystalline) {
 					dataStorage.decrementSessionCounter();
 				};
 
+				function generateCrNode(node) {
+					node.CrID = CrElementCount++;
+					node.CrCleared = true;
+					return node;
+				}
+
 				function generateElement(elementType, properties) {
-					var el = Object.assign(document.createElement(elementType), properties);
-					el.CrID = CrElementCount++;
-					el.CrCleared = true;
-					return el;
+					return generateCrNode(Object.assign(document.createElement(elementType), properties));
+				}
+
+				function generateTextNode(text) {
+					return generateCrNode(document.createTextNode(text));
 				}
 
 				function clearElement(element) {
 					if (!element.CrCleared) {
-						var children = Array.from(element.children);
+						var children = Array.from(element.childNodes);
 						var _iteratorNormalCompletion5 = true;
 						var _didIteratorError5 = false;
 						var _iteratorError5 = undefined;
@@ -544,7 +551,7 @@ if (!window.Crystalline) {
 								updateDispatch(promiseDestination, result, name);
 							}).catch(function (err) {
 								promiseDestination.innerText = "";
-								updateDispatch(promiseDestination, document.createTextNode("Error loading data."));
+								updateDispatch(promiseDestination, generateTextNode("Error loading data."));
 							});
 						} else if ((typeof data === "undefined" ? "undefined" : _typeof(data)) === "object") {
 							var table = generateElement("table");
@@ -554,7 +561,7 @@ if (!window.Crystalline) {
 							if (isTagOutBindable(element.nodeName)) {
 								element.value = data;
 							} else {
-								updateDispatch(element, document.createTextNode(data));
+								updateDispatch(element, generateTextNode(data));
 							}
 						}
 					}
@@ -953,6 +960,10 @@ if (!window.Crystalline) {
 					return http;
 				}();
 
+				function API_clear() {
+					dataStorage.clearAll();
+				}
+
 				function API_debugMode(enabled) {
 					if (enabled === true || enabled === false) {
 						debugMode = enabled;
@@ -1175,7 +1186,8 @@ if (!window.Crystalline) {
 					createElement: Object.freeze(API_createElement),
 					createElementFromData: Object.freeze(API_createElementFromData),
 					http: Object.freeze(API_http),
-					debugMode: Object.freeze(API_debugMode)
+					debugMode: Object.freeze(API_debugMode),
+					clear: Object.freeze(API_clear)
 				}));
 
 				console.log("%c " + libName + " initialized successfully.", "color: #116633");

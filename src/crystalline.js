@@ -338,19 +338,28 @@ if(!window.Crystalline)
 
 				//INTERNAL FUNCTIONS
 
+				function generateCrNode(node)
+				{
+					node.CrID = CrElementCount++;
+					node.CrCleared = true;
+					return node;
+				}
+
 				function generateElement(elementType, properties)
 				{
-					const el = Object.assign(document.createElement(elementType), properties);
-					el.CrID = CrElementCount++;
-					el.CrCleared = true;
-					return el;
+					return generateCrNode(Object.assign(document.createElement(elementType), properties));
+				}
+
+				function generateTextNode(text)
+				{
+					return generateCrNode(document.createTextNode(text));
 				}
 
 				function clearElement(element)
 				{
 					if(!element.CrCleared)
 					{
-						const children = Array.from(element.children);
+						const children = Array.from(element.childNodes);
 						for(const child of children)
 						{
 							if(child.CrID !== undefined)
@@ -423,7 +432,7 @@ if(!window.Crystalline)
 							.catch(function(err)
 							{
 								promiseDestination.innerText = "";
-								updateDispatch(promiseDestination, document.createTextNode("Error loading data."));
+								updateDispatch(promiseDestination, generateTextNode("Error loading data."));
 							});
 						}
 						else if(typeof data === "object")
@@ -440,7 +449,7 @@ if(!window.Crystalline)
 							}
 							else
 							{
-								updateDispatch(element, document.createTextNode(data));
+								updateDispatch(element, generateTextNode(data));
 							}
 						}
 
@@ -795,6 +804,11 @@ if(!window.Crystalline)
 
 				//API FUNCTIONS
 
+				function API_clear()
+				{
+					dataStorage.clearAll();
+				}
+
 				function API_debugMode(enabled)
 				{
 					if(enabled === true || enabled === false)
@@ -1019,7 +1033,8 @@ if(!window.Crystalline)
 					createElement: Object.freeze(API_createElement),
 					createElementFromData: Object.freeze(API_createElementFromData),
 					http: Object.freeze(API_http),
-					debugMode: Object.freeze(API_debugMode)
+					debugMode: Object.freeze(API_debugMode),
+					clear: Object.freeze(API_clear)
 				}));
 
 				console.log(`%c ${libName} initialized successfully.`, "color: #116633");

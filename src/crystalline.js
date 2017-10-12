@@ -202,12 +202,25 @@ if(!window.Crystalline)
 							}
 							if(value && typeof value === "object")
 							{
-								for(let func of ["set", "get", "order", "format"])
+								const funcs = ["set", "get", "order", "format"];
+								for(const funcName of funcs)
 								{
-									value[func] = function(...args)
+									const func = Object.freeze(function(...args)
 									{
-										API[func].apply(this, [name, ...args]);
-									}
+										API[funcName].apply(this, [name, ...args]);
+									});
+
+									Object.defineProperty(value, funcName, {
+										get: function(){
+											return func;
+										},
+										set: function(v)
+										{
+											error(`${funcs} are reserved properties.`);
+										},
+										enumerable: false,
+										configurable: false
+									});
 								}
 							}
 						},

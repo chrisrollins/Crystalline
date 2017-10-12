@@ -268,22 +268,54 @@ if (!window.Crystalline) {
 								}
 							}
 							if (value && (typeof value === "undefined" ? "undefined" : _typeof(value)) === "object") {
-								var _arr2 = ["set", "get", "order", "format"];
+								(function () {
+									var funcs = ["set", "get", "order", "format"];
+									var _iteratorNormalCompletion5 = true;
+									var _didIteratorError5 = false;
+									var _iteratorError5 = undefined;
 
-								var _loop4 = function _loop4() {
-									var func = _arr2[_i2];
-									value[func] = function () {
-										for (var _len2 = arguments.length, args = Array(_len2), _key3 = 0; _key3 < _len2; _key3++) {
-											args[_key3] = arguments[_key3];
+									try {
+										var _loop4 = function _loop4() {
+											var funcName = _step5.value;
+
+											var func = Object.freeze(function () {
+												for (var _len2 = arguments.length, args = Array(_len2), _key3 = 0; _key3 < _len2; _key3++) {
+													args[_key3] = arguments[_key3];
+												}
+
+												API[funcName].apply(this, [name].concat(args));
+											});
+
+											Object.defineProperty(value, funcName, {
+												get: function get() {
+													return func;
+												},
+												set: function set(v) {
+													error(funcs + " are reserved properties.");
+												},
+												enumerable: false,
+												configurable: false
+											});
+										};
+
+										for (var _iterator5 = funcs[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+											_loop4();
 										}
-
-										API[func].apply(this, [name].concat(args));
-									};
-								};
-
-								for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-									_loop4();
-								}
+									} catch (err) {
+										_didIteratorError5 = true;
+										_iteratorError5 = err;
+									} finally {
+										try {
+											if (!_iteratorNormalCompletion5 && _iterator5.return) {
+												_iterator5.return();
+											}
+										} finally {
+											if (_didIteratorError5) {
+												throw _iteratorError5;
+											}
+										}
+									}
+								})();
 							}
 						},
 						get: function get(name) {
@@ -330,10 +362,10 @@ if (!window.Crystalline) {
 					}
 				}
 
-				var _arr3 = ["onabort", "onafterprint", "onanimationcancel", "onanimationend", "onanimationiteration", "onappinstalled", "onauxclick", "onbeforeinstallprompt", "onbeforeprint", "onbeforeunload", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "ondevicelight", "ondevicemotion", "ondeviceorientation", "ondeviceorientationabsolute", "ondeviceproximity", "ondragdrop", "onerror", "onfocus", "ongotpointercapture", "onhashchange", "oninput", "onkeydown", "onkeypress", "onkeyup", "onlanguagechange", "onload", "onloadend", "onloadstart", "onlostpointercapture", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onmozbeforepaint", "onpaint", "onpointercancel", "onpointerdown", "onpointerenter", "onpointerleave", "onpointermove", "onpointerout", "onpointerover", "onpointerup", "onpopstate", "onrejectionhandled", "onreset", "onresize", "onscroll", "onselect", "onselectionchange", "onselectstart", "onstorage", "onsubmit", "ontouchcancel", "ontouchmove", "ontouchstart", "ontransitioncancel", "ontransitionend", "onunhandledrejection", "onunload", "onuserproximity", "onvrdisplayconnected", "onvrdisplaydisconnected", "onvrdisplaypresentchange"];
+				var _arr2 = ["onabort", "onafterprint", "onanimationcancel", "onanimationend", "onanimationiteration", "onappinstalled", "onauxclick", "onbeforeinstallprompt", "onbeforeprint", "onbeforeunload", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "ondevicelight", "ondevicemotion", "ondeviceorientation", "ondeviceorientationabsolute", "ondeviceproximity", "ondragdrop", "onerror", "onfocus", "ongotpointercapture", "onhashchange", "oninput", "onkeydown", "onkeypress", "onkeyup", "onlanguagechange", "onload", "onloadend", "onloadstart", "onlostpointercapture", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onmozbeforepaint", "onpaint", "onpointercancel", "onpointerdown", "onpointerenter", "onpointerleave", "onpointermove", "onpointerout", "onpointerover", "onpointerup", "onpopstate", "onrejectionhandled", "onreset", "onresize", "onscroll", "onselect", "onselectionchange", "onselectstart", "onstorage", "onsubmit", "ontouchcancel", "ontouchmove", "ontouchstart", "ontransitioncancel", "ontransitionend", "onunhandledrejection", "onunload", "onuserproximity", "onvrdisplayconnected", "onvrdisplaydisconnected", "onvrdisplaypresentchange"];
 
 				var _loop6 = function _loop6() {
-					var event = _arr3[_i3];
+					var event = _arr2[_i2];
 					var funcs = [];
 
 					if (window[event] !== undefined && window[event] !== null) {
@@ -348,13 +380,13 @@ if (!window.Crystalline) {
 					window[event] = function (e) {
 						var result = void 0;
 
-						var _iteratorNormalCompletion15 = true;
-						var _didIteratorError15 = false;
-						var _iteratorError15 = undefined;
+						var _iteratorNormalCompletion16 = true;
+						var _didIteratorError16 = false;
+						var _iteratorError16 = undefined;
 
 						try {
-							for (var _iterator15 = funcs[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
-								var f = _step15.value;
+							for (var _iterator16 = funcs[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+								var f = _step16.value;
 
 								try {
 									var fres = f(e);
@@ -366,16 +398,16 @@ if (!window.Crystalline) {
 								}
 							}
 						} catch (err) {
-							_didIteratorError15 = true;
-							_iteratorError15 = err;
+							_didIteratorError16 = true;
+							_iteratorError16 = err;
 						} finally {
 							try {
-								if (!_iteratorNormalCompletion15 && _iterator15.return) {
-									_iterator15.return();
+								if (!_iteratorNormalCompletion16 && _iterator16.return) {
+									_iterator16.return();
 								}
 							} finally {
-								if (_didIteratorError15) {
-									throw _iteratorError15;
+								if (_didIteratorError16) {
+									throw _iteratorError16;
 								}
 							}
 						}
@@ -389,13 +421,13 @@ if (!window.Crystalline) {
 								f[_key12] = arguments[_key12];
 							}
 
-							var _iteratorNormalCompletion16 = true;
-							var _didIteratorError16 = false;
-							var _iteratorError16 = undefined;
+							var _iteratorNormalCompletion17 = true;
+							var _didIteratorError17 = false;
+							var _iteratorError17 = undefined;
 
 							try {
-								for (var _iterator16 = f[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
-									var _func = _step16.value;
+								for (var _iterator17 = f[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
+									var _func = _step17.value;
 
 									if (typeof _func === "function") {
 										funcs.push(_func);
@@ -404,16 +436,16 @@ if (!window.Crystalline) {
 									}
 								}
 							} catch (err) {
-								_didIteratorError16 = true;
-								_iteratorError16 = err;
+								_didIteratorError17 = true;
+								_iteratorError17 = err;
 							} finally {
 								try {
-									if (!_iteratorNormalCompletion16 && _iterator16.return) {
-										_iterator16.return();
+									if (!_iteratorNormalCompletion17 && _iterator17.return) {
+										_iterator17.return();
 									}
 								} finally {
-									if (_didIteratorError16) {
-										throw _iteratorError16;
+									if (_didIteratorError17) {
+										throw _iteratorError17;
 									}
 								}
 							}
@@ -421,7 +453,7 @@ if (!window.Crystalline) {
 					});
 				};
 
-				for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
+				for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
 					_loop6();
 				}
 
@@ -455,29 +487,29 @@ if (!window.Crystalline) {
 				function clearElement(element) {
 					if (!element.CrCleared) {
 						var children = Array.from(element.childNodes);
-						var _iteratorNormalCompletion5 = true;
-						var _didIteratorError5 = false;
-						var _iteratorError5 = undefined;
+						var _iteratorNormalCompletion6 = true;
+						var _didIteratorError6 = false;
+						var _iteratorError6 = undefined;
 
 						try {
-							for (var _iterator5 = children[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-								var child = _step5.value;
+							for (var _iterator6 = children[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+								var child = _step6.value;
 
 								if (child.CrID !== undefined) {
 									child.remove();
 								}
 							}
 						} catch (err) {
-							_didIteratorError5 = true;
-							_iteratorError5 = err;
+							_didIteratorError6 = true;
+							_iteratorError6 = err;
 						} finally {
 							try {
-								if (!_iteratorNormalCompletion5 && _iterator5.return) {
-									_iterator5.return();
+								if (!_iteratorNormalCompletion6 && _iterator6.return) {
+									_iterator6.return();
 								}
 							} finally {
-								if (_didIteratorError5) {
-									throw _iteratorError5;
+								if (_didIteratorError6) {
+									throw _iteratorError6;
 								}
 							}
 						}
@@ -491,27 +523,27 @@ if (!window.Crystalline) {
 				}
 
 				function refreshName(name) {
-					var _iteratorNormalCompletion6 = true;
-					var _didIteratorError6 = false;
-					var _iteratorError6 = undefined;
+					var _iteratorNormalCompletion7 = true;
+					var _didIteratorError7 = false;
+					var _iteratorError7 = undefined;
 
 					try {
-						for (var _iterator6 = (nameBindings[name] || [])[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-							var element = _step6.value;
+						for (var _iterator7 = (nameBindings[name] || [])[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+							var element = _step7.value;
 
 							updateDispatch(element, dataStorage.get(name), element.CrNameBind);
 						}
 					} catch (err) {
-						_didIteratorError6 = true;
-						_iteratorError6 = err;
+						_didIteratorError7 = true;
+						_iteratorError7 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion6 && _iterator6.return) {
-								_iterator6.return();
+							if (!_iteratorNormalCompletion7 && _iterator7.return) {
+								_iterator7.return();
 							}
 						} finally {
-							if (_didIteratorError6) {
-								throw _iteratorError6;
+							if (_didIteratorError7) {
+								throw _iteratorError7;
 							}
 						}
 					}
@@ -569,13 +601,13 @@ if (!window.Crystalline) {
 					function lists() {
 						if (Array.isArray(data)) {
 							var fragment = document.createDocumentFragment();
-							var _iteratorNormalCompletion7 = true;
-							var _didIteratorError7 = false;
-							var _iteratorError7 = undefined;
+							var _iteratorNormalCompletion8 = true;
+							var _didIteratorError8 = false;
+							var _iteratorError8 = undefined;
 
 							try {
-								for (var _iterator7 = data[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-									var item = _step7.value;
+								for (var _iterator8 = data[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+									var item = _step8.value;
 
 									var li = generateElement("li");
 									if ((typeof item === "undefined" ? "undefined" : _typeof(item)) === "object") {
@@ -586,16 +618,16 @@ if (!window.Crystalline) {
 									fragment.appendChild(li);
 								}
 							} catch (err) {
-								_didIteratorError7 = true;
-								_iteratorError7 = err;
+								_didIteratorError8 = true;
+								_iteratorError8 = err;
 							} finally {
 								try {
-									if (!_iteratorNormalCompletion7 && _iterator7.return) {
-										_iterator7.return();
+									if (!_iteratorNormalCompletion8 && _iterator8.return) {
+										_iterator8.return();
 									}
 								} finally {
-									if (_didIteratorError7) {
-										throw _iteratorError7;
+									if (_didIteratorError8) {
+										throw _iteratorError8;
 									}
 								}
 							}
@@ -615,52 +647,18 @@ if (!window.Crystalline) {
 							var tbodyFrag = document.createDocumentFragment();
 							if (element.nodeName === "TABLE") {
 								var children = Array.from(element.children);
-								var _iteratorNormalCompletion8 = true;
-								var _didIteratorError8 = false;
-								var _iteratorError8 = undefined;
-
-								try {
-									for (var _iterator8 = children[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-										var child = _step8.value;
-
-										if (child.nodeName === "THEAD") {
-											thead = child;
-										} else if (child.nodeName === "TBODY") {
-											tbody = child;
-										}
-									}
-								} catch (err) {
-									_didIteratorError8 = true;
-									_iteratorError8 = err;
-								} finally {
-									try {
-										if (!_iteratorNormalCompletion8 && _iterator8.return) {
-											_iterator8.return();
-										}
-									} finally {
-										if (_didIteratorError8) {
-											throw _iteratorError8;
-										}
-									}
-								}
-							}
-
-							if (Array.isArray(data)) {
-								var colNames = new Set(dataStorage.getOrder(name));
 								var _iteratorNormalCompletion9 = true;
 								var _didIteratorError9 = false;
 								var _iteratorError9 = undefined;
 
 								try {
-									for (var _iterator9 = data[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-										var _item = _step9.value;
+									for (var _iterator9 = children[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+										var child = _step9.value;
 
-										if ((typeof _item === "undefined" ? "undefined" : _typeof(_item)) === "object" && !Array.isArray(_item)) {
-											for (var _key5 in _item) {
-												if ((format[_key5] || Object.create(null)).showValue !== false) {
-													colNames.add(_key5);
-												}
-											}
+										if (child.nodeName === "THEAD") {
+											thead = child;
+										} else if (child.nodeName === "TBODY") {
+											tbody = child;
 										}
 									}
 								} catch (err) {
@@ -677,18 +675,52 @@ if (!window.Crystalline) {
 										}
 									}
 								}
+							}
+
+							if (Array.isArray(data)) {
+								var colNames = new Set(dataStorage.getOrder(name));
+								var _iteratorNormalCompletion10 = true;
+								var _didIteratorError10 = false;
+								var _iteratorError10 = undefined;
+
+								try {
+									for (var _iterator10 = data[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+										var _item = _step10.value;
+
+										if ((typeof _item === "undefined" ? "undefined" : _typeof(_item)) === "object" && !Array.isArray(_item)) {
+											for (var _key5 in _item) {
+												if ((format[_key5] || Object.create(null)).showValue !== false) {
+													colNames.add(_key5);
+												}
+											}
+										}
+									}
+								} catch (err) {
+									_didIteratorError10 = true;
+									_iteratorError10 = err;
+								} finally {
+									try {
+										if (!_iteratorNormalCompletion10 && _iterator10.return) {
+											_iterator10.return();
+										}
+									} finally {
+										if (_didIteratorError10) {
+											throw _iteratorError10;
+										}
+									}
+								}
 
 								var colNameArr = Array.from(colNames.values());
 
 								if (colNames.size > 0) {
 									var tr = generateElement("tr");
-									var _iteratorNormalCompletion10 = true;
-									var _didIteratorError10 = false;
-									var _iteratorError10 = undefined;
+									var _iteratorNormalCompletion11 = true;
+									var _didIteratorError11 = false;
+									var _iteratorError11 = undefined;
 
 									try {
-										for (var _iterator10 = colNameArr[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-											var colName = _step10.value;
+										for (var _iterator11 = colNameArr[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+											var colName = _step11.value;
 
 											if ((format[colName] || Object.create(null)).showTitle !== false) {
 												var th = generateElement("th");
@@ -697,16 +729,16 @@ if (!window.Crystalline) {
 											}
 										}
 									} catch (err) {
-										_didIteratorError10 = true;
-										_iteratorError10 = err;
+										_didIteratorError11 = true;
+										_iteratorError11 = err;
 									} finally {
 										try {
-											if (!_iteratorNormalCompletion10 && _iterator10.return) {
-												_iterator10.return();
+											if (!_iteratorNormalCompletion11 && _iterator11.return) {
+												_iterator11.return();
 											}
 										} finally {
-											if (_didIteratorError10) {
-												throw _iteratorError10;
+											if (_didIteratorError11) {
+												throw _iteratorError11;
 											}
 										}
 									}
@@ -720,13 +752,13 @@ if (!window.Crystalline) {
 									var attachRow = true;
 									if ((typeof arr === "undefined" ? "undefined" : _typeof(arr)) === "object" && !Array.isArray(arr) && arr !== null) {
 										var atLeastOneColumn = false;
-										var _iteratorNormalCompletion11 = true;
-										var _didIteratorError11 = false;
-										var _iteratorError11 = undefined;
+										var _iteratorNormalCompletion12 = true;
+										var _didIteratorError12 = false;
+										var _iteratorError12 = undefined;
 
 										try {
-											for (var _iterator11 = colNameArr[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-												var _colName = _step11.value;
+											for (var _iterator12 = colNameArr[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+												var _colName = _step12.value;
 
 												var td = generateElement("td");
 												if (arr[_colName] !== "" && arr[_colName] !== undefined) {
@@ -751,36 +783,6 @@ if (!window.Crystalline) {
 												_tr.appendChild(td);
 											}
 										} catch (err) {
-											_didIteratorError11 = true;
-											_iteratorError11 = err;
-										} finally {
-											try {
-												if (!_iteratorNormalCompletion11 && _iterator11.return) {
-													_iterator11.return();
-												}
-											} finally {
-												if (_didIteratorError11) {
-													throw _iteratorError11;
-												}
-											}
-										}
-
-										attachRow = atLeastOneColumn;
-									} else if (arr !== undefined && arr !== null) {
-										var inner = Array.isArray(arr) ? arr : [arr];
-										var _iteratorNormalCompletion12 = true;
-										var _didIteratorError12 = false;
-										var _iteratorError12 = undefined;
-
-										try {
-											for (var _iterator12 = inner[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-												var item = _step12.value;
-
-												var _td = generateElement("td");
-												updateDispatch(_td, item, name);
-												_tr.appendChild(_td);
-											}
-										} catch (err) {
 											_didIteratorError12 = true;
 											_iteratorError12 = err;
 										} finally {
@@ -791,6 +793,36 @@ if (!window.Crystalline) {
 											} finally {
 												if (_didIteratorError12) {
 													throw _iteratorError12;
+												}
+											}
+										}
+
+										attachRow = atLeastOneColumn;
+									} else if (arr !== undefined && arr !== null) {
+										var inner = Array.isArray(arr) ? arr : [arr];
+										var _iteratorNormalCompletion13 = true;
+										var _didIteratorError13 = false;
+										var _iteratorError13 = undefined;
+
+										try {
+											for (var _iterator13 = inner[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+												var item = _step13.value;
+
+												var _td = generateElement("td");
+												updateDispatch(_td, item, name);
+												_tr.appendChild(_td);
+											}
+										} catch (err) {
+											_didIteratorError13 = true;
+											_iteratorError13 = err;
+										} finally {
+											try {
+												if (!_iteratorNormalCompletion13 && _iterator13.return) {
+													_iterator13.return();
+												}
+											} finally {
+												if (_didIteratorError13) {
+													throw _iteratorError13;
 												}
 											}
 										}
@@ -889,9 +921,9 @@ if (!window.Crystalline) {
 						var thisRef = this;
 						var fetchOptions = {};
 						var optionsSource = (typeof options === "undefined" ? "undefined" : _typeof(options)) === "object" ? Object.assign(generateOptions(), options) : thisRef.options;
-						var _arr4 = ["mode", "headers", "credentials", "cache", "redirect", "referrer", "integrity"];
-						for (var _i4 = 0; _i4 < _arr4.length; _i4++) {
-							var _key6 = _arr4[_i4];
+						var _arr3 = ["mode", "headers", "credentials", "cache", "redirect", "referrer", "integrity"];
+						for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
+							var _key6 = _arr3[_i3];
 							fetchOptions[_key6] = optionsSource[_key6];
 						}
 
@@ -933,10 +965,10 @@ if (!window.Crystalline) {
 					});
 
 					var applyMethods = function applyMethods(obj) {
-						var _arr5 = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+						var _arr4 = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 
-						for (var _i5 = 0; _i5 < _arr5.length; _i5++) {
-							var method = _arr5[_i5];
+						for (var _i4 = 0; _i4 < _arr4.length; _i4++) {
+							var method = _arr4[_i4];
 							obj[method.toLowerCase()] = httpSend.bind(obj, method);
 						}
 						obj.request = httpSend.bind(obj);
@@ -1103,56 +1135,17 @@ if (!window.Crystalline) {
 					function inBind(_elements, dataName) {
 						delayUntilLoad(function () {
 							var elements = elArrHelper(_elements);
-							var _iteratorNormalCompletion13 = true;
-							var _didIteratorError13 = false;
-							var _iteratorError13 = undefined;
-
-							try {
-								for (var _iterator13 = elements[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-									var el = _step13.value;
-
-									(nameBindings[dataName] || (nameBindings[dataName] = [])).push(el);
-									el.CrNameBind = dataName;
-									refreshElement(el);
-								}
-							} catch (err) {
-								_didIteratorError13 = true;
-								_iteratorError13 = err;
-							} finally {
-								try {
-									if (!_iteratorNormalCompletion13 && _iterator13.return) {
-										_iterator13.return();
-									}
-								} finally {
-									if (_didIteratorError13) {
-										throw _iteratorError13;
-									}
-								}
-							}
-						});
-						return funcs;
-					}
-
-					function outBind(_elements, dataName) {
-						delayUntilLoad(function () {
-							var elements = elArrHelper(_elements);
 							var _iteratorNormalCompletion14 = true;
 							var _didIteratorError14 = false;
 							var _iteratorError14 = undefined;
 
 							try {
-								var _loop5 = function _loop5() {
+								for (var _iterator14 = elements[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
 									var el = _step14.value;
 
-									if (isTagOutBindable(el.nodeName)) {
-										el.oninput = function () {
-											API_set(dataName, el.value);
-										};
-									}
-								};
-
-								for (var _iterator14 = elements[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-									_loop5();
+									(nameBindings[dataName] || (nameBindings[dataName] = [])).push(el);
+									el.CrNameBind = dataName;
+									refreshElement(el);
 								}
 							} catch (err) {
 								_didIteratorError14 = true;
@@ -1165,6 +1158,45 @@ if (!window.Crystalline) {
 								} finally {
 									if (_didIteratorError14) {
 										throw _iteratorError14;
+									}
+								}
+							}
+						});
+						return funcs;
+					}
+
+					function outBind(_elements, dataName) {
+						delayUntilLoad(function () {
+							var elements = elArrHelper(_elements);
+							var _iteratorNormalCompletion15 = true;
+							var _didIteratorError15 = false;
+							var _iteratorError15 = undefined;
+
+							try {
+								var _loop5 = function _loop5() {
+									var el = _step15.value;
+
+									if (isTagOutBindable(el.nodeName)) {
+										el.oninput = function () {
+											API_set(dataName, el.value);
+										};
+									}
+								};
+
+								for (var _iterator15 = elements[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+									_loop5();
+								}
+							} catch (err) {
+								_didIteratorError15 = true;
+								_iteratorError15 = err;
+							} finally {
+								try {
+									if (!_iteratorNormalCompletion15 && _iterator15.return) {
+										_iterator15.return();
+									}
+								} finally {
+									if (_didIteratorError15) {
+										throw _iteratorError15;
 									}
 								}
 							}

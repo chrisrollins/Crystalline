@@ -928,6 +928,10 @@ if (!window.Crystalline) {
 						}
 
 						if (optionsSource.body) {
+							if (Array.isArray(optionsSource.body) || Object.getPrototypeOf(optionsSource.body) === Object.prototype || Object.getPrototypeOf(optionsSource.body) === null) {
+								optionsSource.body = JSON.stringify(optionsSource.body);
+							}
+
 							if (method.toUpperCase() !== "GET" && method.toUpperCase() !== "HEAD") {
 								fetchOptions.body = optionsSource.body;
 							} else {
@@ -1222,7 +1226,7 @@ if (!window.Crystalline) {
 					clear: Object.freeze(API_clear)
 				}));
 
-				console.log("%c " + libName + " initialized successfully.", "color: #116633");
+				console.log(libName + " initialized successfully.");
 
 				return lib;
 			}();

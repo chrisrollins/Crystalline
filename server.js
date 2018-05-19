@@ -85,11 +85,29 @@ const sendFile = function(response, filename)
 	});
 }
 
+const handleRequestBody = function(request, callback)
+{
+	let body = [];
+	request.on("data", function(chunk)
+	{
+		body.push(chunk);
+	}).on("end", function()
+	{
+		body = Buffer.concat(body).toString();
+		callback(body);
+	});
+}
+
 
 //MAIN CONTROLLER
 const mainController = function(request, response)
 {
 	console.log("Requested URL:", request.url);
+	console.log("method:", request.method);
+	handleRequestBody(request, function(body)
+	{
+		console.log("body:", body);
+	});
 	return true;
 }
 
